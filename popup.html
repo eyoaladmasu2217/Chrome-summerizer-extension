@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summerizer</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Hi! From Summerizer</h1>
     <div id="output">Your summary will appear here...</div>
-    <button id="summarizeBtn">Summarize Current Tab</button>
+    <div id="summary-area" class="summary-field">
+        <textarea id="summary" rows="10" cols="50" readonly></textarea>
+    </div>
+    <button class="buttons">Summarize</button>
 </body>
 </html>

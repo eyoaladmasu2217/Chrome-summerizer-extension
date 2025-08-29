@@ -1,0 +1,80 @@
+/* From Uiverse.io by yaasiinaxmed */ 
+button {
+  --color: #0077ff;
+  font-family: inherit;
+  display: inline-block;
+  width: 6em;
+  height: 2.6em;
+  line-height: 2.5em;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 20px;
+  font-size: 17px;
+  z-index: 1;
+  color: var(--color);
+  border: 2px solid var(--color);
+  border-radius: 6px;
+  position: relative;
+}
+
+button::before {
+  position: absolute;
+  content: "";
+  background: var(--color);
+  width: 150px;
+  height: 200px;
+  z-index: -1;
+  border-radius: 50%;
+}
+
+button:hover {
+  color: white;
+}
+
+button:before {
+  top: 100%;
+  left: 100%;
+  transition: 0.3s all;
+}
+
+button:hover::before {
+  top: -30px;
+  left: -30px;
+}
+
+textarea {
+  font-family: inherit;
+  width: 250px; 
+  height: 100px; 
+  margin: 10px; 
+  font-size: 16px; 
+  color: #0077ff; 
+  border: 2px solid #0077ff; 
+  border-radius: 6px; 
+  padding: 8px; 
+  resize: none; 
+  transition: border-color 0.3s; 
+}
+
+
+textarea:hover {
+  border-color: #0056b3; 
+}
+
+#summary-overlay {
+    max-width: 500px;
+    max-height: 500px;
+    overflow-y: scroll;
+    cursor: pointer;
+    position: absolute;
+    border-radius: 4px;
+    background-color: #333;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    z-index: 10000;
+    color: #fff;
+}
