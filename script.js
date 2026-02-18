@@ -103,6 +103,22 @@ const showOverlay = () => {
     overlay.style.left = `${rect.left}px`;
 };
 
+// Respond to popup requests for page data
+chrome.runtime && chrome.runtime.onMessage && chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (!message || message.type !== 'GET_PAGE_DATA') return;
+    try {
+        const text = document.body.innerText || document.body.textContent || '';
+        const links = Array.from(document.querySelectorAll('a[href]'))
+            .map(a => ({ text: a.textContent.trim(), href: a.href }))
+            .filter(l => l.text && (l.href.startsWith('http') || l.href.startsWith('https')));
+        sendResponse({ text: text.trim(), links });
+    } catch (err) {
+        sendResponse({ text: '', links: [] });
+    }
+    // indicate we'll respond synchronously
+    return true;
+});
+
 document.addEventListener('mouseup', event => {
     if (event.target.closest && event.target.closest('#summary-overlay')) return;
 

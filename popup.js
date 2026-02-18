@@ -11,18 +11,44 @@ window.addEventListener('DOMContentLoaded', () => {
         try {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-            const results = await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                func: () => {
-                    const text = document.body.innerText || document.body.textContent || '';
-                    const links = Array.from(document.querySelectorAll('a[href]'))
-                        .map(a => ({ text: a.textContent.trim(), href: a.href }))
-                        .filter(l => l.text && (l.href.startsWith('http') || l.href.startsWith('https')));
-                    return { text: text.trim(), links };
-                }
-            });
+            // Helper: try to get page data via message; fall back to scripting.executeScript if needed
+            const getPageData = async (tabId) => {
+                return new Promise((resolve) => {
+                    // First try content script message
+                    chrome.tabs.sendMessage(tabId, { type: 'GET_PAGE_DATA' }, (response) => {
+                        if (!chrome.runtime.lastError && response) {
+                            console.debug('Received page data via sendMessage');
+                            return resolve(response);
+                        }
 
-            const pageData = results[0].result;
+                        // Fallback: try chrome.scripting.executeScript if available
+                        if (chrome.scripting && chrome.scripting.executeScript) {
+                            console.debug('sendMessage failed, falling back to scripting.executeScript');
+                            chrome.scripting.executeScript(
+                                { target: { tabId }, func: () => {
+                                    const text = document.body.innerText || document.body.textContent || '';
+                                    const links = Array.from(document.querySelectorAll('a[href]'))
+                                        .map(a => ({ text: a.textContent.trim(), href: a.href }))
+                                        .filter(l => l.text && (l.href.startsWith('http') || l.href.startsWith('https')));
+                                    return { text: text.trim(), links };
+                                }},
+                                (results) => {
+                                    if (chrome.runtime.lastError || !results || !results[0]) {
+                                        console.warn('scripting.executeScript returned no result or lastError', chrome.runtime.lastError);
+                                        return resolve({ text: '', links: [] });
+                                    }
+                                    return resolve(results[0].result || { text: '', links: [] });
+                                }
+                            );
+                        } else {
+                            console.warn('No content script response and chrome.scripting unavailable');
+                            return resolve({ text: '', links: [] });
+                        }
+                    });
+                });
+            };
+
+            const pageData = await getPageData(tab.id);
 
             if (!pageData || !pageData.text || pageData.text.length < 100) {
                 alert('Not enough text found on this page to summarize.');
