@@ -3,12 +3,18 @@ const MODEL = 'Summerizer';
 
 let overlay = null;
 
-const getSummary = async text => {
+const getSummary = async (text, links = []) => {
     try {
         const headers = {
             Authorization: `Bearer ${AIML_API_KEY}`,
             'Content-Type': 'application/json',
         };
+        
+        let linksSection = '';
+        if (links.length > 0) {
+            linksSection = `\n\nLinks found on the page:\n${links.map(link => `- [${link.text}](${link.href})`).join('\n')}`;
+        }
+        
         const jsonData = {
             model: MODEL,
             messages: [
@@ -18,13 +24,14 @@ const getSummary = async text => {
                         `You are an AI assistant who 
                         provides summaries for long texts. 
                         You are using HTML tags to format 
-                        your response.`,
+                        your response. Include a "Links" section 
+                        at the end if links are provided.`,
                 },
                 {
                     role: 'user',
                     content: 
                     	`Please summarize the following 
-                        text: ${text}`,
+                        text: ${text}${linksSection}`,
                 },
             ],
         };
@@ -43,6 +50,7 @@ const getSummary = async text => {
         return data.choices[0].message.content;
     } catch (error) {
         console.log(`Error: ${error}`);
+        throw error;
     }
 };
 
