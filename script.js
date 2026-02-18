@@ -1,4 +1,4 @@
-const AIML_API_KEY = '99bd4f0072414eabb3f62da667581f7b'; // Replace with your AIML_API_KEY
+const AIML_API_KEY = '99bd4f0072414eabb3f62da667581f7b';
 const MODEL = 'Summerizer';
 
 let overlay = null;
@@ -63,12 +63,15 @@ const createSummaryOverlay = text => {
         summaryButton.disabled = true;
         try {
             const summary = await getSummary(text);
-            summaryButton.textContent = 'Summary';
+            summaryButton.textContent = 'Summarize';
+            summaryButton.disabled = false;
             const summaryContainer = document.createElement('div');
             summaryContainer.innerHTML = summary;
             overlay.appendChild(summaryContainer);
         } catch (error) {
             console.log(`Error: ${error}`);
+            summaryButton.textContent = 'Error - Try Again';
+            summaryButton.disabled = false;
         }
     });
 };

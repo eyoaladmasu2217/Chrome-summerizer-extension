@@ -1,80 +1,154 @@
-/* From Uiverse.io by yaasiinaxmed */ 
-button {
-  --color: #0077ff;
-  font-family: inherit;
-  display: inline-block;
-  width: 6em;
-  height: 2.6em;
-  line-height: 2.5em;
-  overflow: hidden;
-  cursor: pointer;
-  margin: 20px;
-  font-size: 17px;
-  z-index: 1;
-  color: var(--color);
-  border: 2px solid var(--color);
-  border-radius: 6px;
-  position: relative;
-}
+/* Google-inspired styles for Chrome Summarizer Extension */
 
-button::before {
-  position: absolute;
-  content: "";
-  background: var(--color);
-  width: 150px;
-  height: 200px;
-  z-index: -1;
-  border-radius: 50%;
-}
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
-button:hover {
-  color: white;
-}
-
-button:before {
-  top: 100%;
-  left: 100%;
-  transition: 0.3s all;
-}
-
-button:hover::before {
-  top: -30px;
-  left: -30px;
-}
-
-textarea {
-  font-family: inherit;
-  width: 250px; 
-  height: 100px; 
-  margin: 10px; 
-  font-size: 16px; 
-  color: #0077ff; 
-  border: 2px solid #0077ff; 
-  border-radius: 6px; 
-  padding: 8px; 
-  resize: none; 
-  transition: border-color 0.3s; 
-}
-
-
-textarea:hover {
-  border-color: #0056b3; 
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
 }
 
 #summary-overlay {
-    max-width: 500px;
-    max-height: 500px;
-    overflow-y: scroll;
-    cursor: pointer;
-    position: absolute;
-    border-radius: 4px;
-    background-color: #333;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    box-sizing: border-box;
-    z-index: 10000;
-    color: #fff;
+  max-width: 400px;
+  max-height: 600px;
+  overflow-y: auto;
+  cursor: pointer;
+  position: absolute;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(32, 33, 36, 0.28);
+  border: 1px solid #dadce0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  box-sizing: border-box;
+  z-index: 10000;
+  color: #202124;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#summary-overlay button {
+  background-color: #1a73e8;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-bottom: 12px;
+  align-self: flex-start;
+}
+
+#summary-overlay button:hover {
+  background-color: #1557b0;
+}
+
+#summary-overlay button:disabled {
+  background-color: #dadce0;
+  color: #5f6368;
+  cursor: not-allowed;
+}
+
+#summary-overlay div {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f1f3f4;
+  border-radius: 4px;
+  border-left: 4px solid #1a73e8;
+}
+
+#summary-overlay h1,
+#summary-overlay h2,
+#summary-overlay h3 {
+  color: #202124;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+#summary-overlay p {
+  margin: 0 0 8px 0;
+  color: #5f6368;
+}
+
+#summary-overlay ul,
+#summary-overlay ol {
+  margin: 0 0 8px 0;
+  padding-left: 20px;
+}
+
+#summary-overlay li {
+  margin-bottom: 4px;
+  color: #5f6368;
+}
+
+/* Popup styles */
+h1 {
+  color: #202124;
+  font-size: 24px;
+  font-weight: 400;
+  margin: 16px 0;
+  text-align: center;
+}
+
+#output {
+  color: #5f6368;
+  font-size: 14px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.summary-field {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+textarea {
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
+  max-width: 300px;
+  height: 150px;
+  margin: 0;
+  font-size: 14px;
+  color: #202124;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  padding: 12px;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+  background-color: #ffffff;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.buttons {
+  background-color: #1a73e8;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: block;
+  margin: 16px auto;
+}
+
+.buttons:hover {
+  background-color: #1557b0;
+}
+
+.buttons:disabled {
+  background-color: #dadce0;
+  color: #5f6368;
+  cursor: not-allowed;
 }
