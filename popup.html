@@ -7,11 +7,20 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Text Summarizer</h1>
-    <div id="output">Click the button to summarize the current webpage.</div>
-    <div id="summary-area" class="summary-field">
-        <textarea id="summary" rows="10" cols="50" readonly placeholder="Summary will appear here..."></textarea>
+    <div class="extension-popup">
+        <h1>Text Summarizer</h1>
+        <div id="output">Click the button to summarize the current webpage.</div>
+        <div id="summary-area" class="summary-field">
+            <textarea id="summary" rows="10" cols="50" readonly placeholder="Summary will appear here..."></textarea>
+        </div>
+
+        <div id="links-section" class="links-section" style="display:none;">
+            <h3>Links</h3>
+            <ul id="links-list"></ul>
+        </div>
+
+        <button id="summarize-btn" class="buttons">Summarize</button>
     </div>
-    <button id="summarize-btn" class="buttons">Summarize</button>
+    <script src="popup.js"></script>
 </body>
 </html>

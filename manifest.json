@@ -4,29 +4,27 @@
   "version": "1.0",
   "description": "Write a summary of the current active tab.",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "scripting"
   ],
   "host_permissions": [
-    "*://*.aimlapi.com/*"  // Grants access to all subdomains of aimlapi.com
+    "*://*.aimlapi.com/*"
   ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": ["script.js"],
-      "css": ["styles.css"]  // Add styles if needed
+      "css": ["styles.css"]
     }
   ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icon16.png",
-      "48": "icon48.png",
       "128": "icon128.png"
     }
-  },
+  }
+  ,
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
     "128": "icon128.png"
   }
 }

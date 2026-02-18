@@ -1,63 +1,67 @@
-document
-    .getElementById('summarize-btn')
-    .addEventListener('click', async function clickSummary() {
-        const btnSummary = document.getElementById('summarize-btn');
-        const textarea = document.getElementById('summary');
+window.addEventListener('DOMContentLoaded', () => {
+    const summarizeBtn = document.getElementById('summarize-btn');
+    const textarea = document.getElementById('summary');
+    const linksList = document.getElementById('links-list');
+    const linksSection = document.getElementById('links-section');
 
-        // Update button text to indicate the process has started
-        btnSummary.innerText = 'Summarizing...';
-        btnSummary.disabled = true;
+    summarizeBtn.addEventListener('click', async () => {
+        summarizeBtn.innerText = 'Summarizing...';
+        summarizeBtn.disabled = true;
 
         try {
-            // Identify the active tab in the current browser window
-            const [tab] = await chrome.tabs.query({
-                active: true,
-                currentWindow: true,
-            });
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-            // Execute script to get the page text and links
             const results = await chrome.scripting.executeScript({
                 target: { tabId: tab.id },
                 func: () => {
-                    // Get all text content from the page
-                    const text = document.body.innerText || document.body.textContent;
-                    
-                    // Get all links
+                    const text = document.body.innerText || document.body.textContent || '';
                     const links = Array.from(document.querySelectorAll('a[href]'))
-                        .map(a => ({
-                            text: a.textContent.trim(),
-                            href: a.href
-                        }))
-                        .filter(link => link.text && link.href.startsWith('http'));
-                    
-                    return {
-                        text: text.trim(),
-                        links: links
-                    };
-                },
+                        .map(a => ({ text: a.textContent.trim(), href: a.href }))
+                        .filter(l => l.text && (l.href.startsWith('http') || l.href.startsWith('https')));
+                    return { text: text.trim(), links };
+                }
             });
 
             const pageData = results[0].result;
 
-            if (!pageData.text || pageData.text.length < 100) {
+            if (!pageData || !pageData.text || pageData.text.length < 100) {
                 alert('Not enough text found on this page to summarize.');
-                btnSummary.innerText = 'Summarize';
-                btnSummary.disabled = false;
+                summarizeBtn.innerText = 'Summarize';
+                summarizeBtn.disabled = false;
                 return;
             }
 
-            // Summarize the text and include links
             const summary = await getSummary(pageData.text, pageData.links);
             textarea.value = summary;
-            btnSummary.innerText = 'Summarize';
-            btnSummary.disabled = false;
+
+            // Populate links section
+            linksList.innerHTML = '';
+            if (pageData.links && pageData.links.length > 0) {
+                pageData.links.forEach(link => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = link.href;
+                    a.textContent = link.text || link.href;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    li.appendChild(a);
+                    linksList.appendChild(li);
+                });
+                linksSection.style.display = 'block';
+            } else {
+                linksSection.style.display = 'none';
+            }
+
+            summarizeBtn.innerText = 'Summarize';
+            summarizeBtn.disabled = false;
         } catch (error) {
-            console.log(`Error: ${error}`);
-            alert('An error occurred while summarizing. Please try again.');
-            btnSummary.innerText = 'Summarize';
-            btnSummary.disabled = false;
+            console.error(error);
+            alert('An error occurred while summarizing. See console for details.');
+            summarizeBtn.innerText = 'Summarize';
+            summarizeBtn.disabled = false;
         }
     });
+});
 
 // Define getSummary function here as well, or import it
 const AIML_API_KEY = '99bd4f0072414eabb3f62da667581f7b';

@@ -55,6 +55,11 @@ const getSummary = async (text, links = []) => {
 };
 
 const createSummaryOverlay = text => {
+    if (overlay) {
+        try { overlay.remove(); } catch (e) {}
+        overlay = null;
+    }
+
     overlay = document.createElement('div');
     overlay.id = 'summary-overlay';
     overlay.style.display = 'none';
@@ -66,22 +71,26 @@ const createSummaryOverlay = text => {
     overlay.appendChild(summaryButton);
     document.body.appendChild(overlay);
 
-    summaryButton.addEventListener('click', async () => {
-        summaryButton.textContent = 'Summarizing...';
-        summaryButton.disabled = true;
-        try {
-            const summary = await getSummary(text);
-            summaryButton.textContent = 'Summarize';
-            summaryButton.disabled = false;
-            const summaryContainer = document.createElement('div');
-            summaryContainer.innerHTML = summary;
-            overlay.appendChild(summaryContainer);
-        } catch (error) {
-            console.log(`Error: ${error}`);
-            summaryButton.textContent = 'Error - Try Again';
-            summaryButton.disabled = false;
-        }
-    });
+        summaryButton.addEventListener('click', async () => {
+            summaryButton.textContent = 'Summarizing...';
+            summaryButton.disabled = true;
+            try {
+                const summary = await getSummary(text);
+                summaryButton.textContent = 'Summarize';
+                summaryButton.disabled = false;
+                // remove previous summary if present
+                const prev = overlay.querySelector('.summary-content');
+                if (prev) prev.remove();
+                const summaryContainer = document.createElement('div');
+                summaryContainer.className = 'summary-content';
+                summaryContainer.innerHTML = summary;
+                overlay.appendChild(summaryContainer);
+            } catch (error) {
+                console.log(`Error: ${error}`);
+                summaryButton.textContent = 'Error - Try Again';
+                summaryButton.disabled = false;
+            }
+        });
 };
 
 const showOverlay = () => {
@@ -95,16 +104,18 @@ const showOverlay = () => {
 };
 
 document.addEventListener('mouseup', event => {
-    if (event.target.closest('#summary-overlay')) return;
+    if (event.target.closest && event.target.closest('#summary-overlay')) return;
 
-    const selectedText = window.getSelection().toString().trim();
+    const selection = window.getSelection && window.getSelection();
+    const selectedText = selection ? selection.toString().trim() : '';
 
     if (selectedText.length > 200 && selectedText.length < 7000) {
-        if (!overlay) createSummaryOverlay();
+        if (!overlay) createSummaryOverlay(selectedText);
+        else overlay.dataset.text = selectedText;
 
         showOverlay();
     } else if (overlay) {
-        document.body.removeChild(overlay);
+        try { overlay.remove(); } catch (e) {}
         overlay = null;
     }
 });
