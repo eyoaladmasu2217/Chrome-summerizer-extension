@@ -9,17 +9,32 @@
 <body>
     <div class="extension-popup">
         <h1>Text Summarizer</h1>
-        <div id="output">Click the button to summarize the current webpage.</div>
-        <div id="summary-area" class="summary-field">
-            <textarea id="summary" rows="10" cols="50" readonly placeholder="Summary will appear here..."></textarea>
+        <div class="tabs" role="tablist">
+            <button id="summarize-tab" class="tab-button active" role="tab" aria-selected="true" aria-controls="summarize-section">Summarize</button>
+            <button id="history-tab" class="tab-button" role="tab" aria-selected="false" aria-controls="history-section">History</button>
         </div>
+        <div id="summarize-section" class="tab-content active" role="tabpanel" aria-labelledby="summarize-tab">
+            <div id="output">Click the button to summarize the current webpage.</div>
+            <div id="summary-area" class="summary-field">
+                <textarea id="summary" rows="10" cols="50" readonly placeholder="Summary will appear here..." aria-label="Summary output"></textarea>
+            </div>
 
-        <div id="links-section" class="links-section" style="display:none;">
-            <h3>Links</h3>
-            <ul id="links-list"></ul>
+            <div id="links-section" class="links-section" style="display:none;">
+                <h3>Links</h3>
+                <ul id="links-list" aria-label="Extracted links"></ul>
+            </div>
+
+            <button id="summarize-btn" class="buttons" aria-label="Summarize current page">Summarize</button>
+            <button id="test-ai-btn" class="buttons" style="margin-top:8px;background:#34a853;" aria-label="Test AI connection">Test AI</button>
+            <div class="export-buttons" style="margin-top:12px;">
+                <button id="copy-btn" class="buttons" style="background:#fbbc04;" aria-label="Copy summary to clipboard">Copy to Clipboard</button>
+                <button id="download-btn" class="buttons" style="background:#ea4335;" aria-label="Download summary as text file">Download as TXT</button>
+            </div>
         </div>
-
-        <button id="summarize-btn" class="buttons">Summarize</button>
+        <div id="history-section" class="tab-content" style="display:none;" role="tabpanel" aria-labelledby="history-tab">
+            <h3>Summary History</h3>
+            <div id="history-list" aria-label="List of previous summaries"></div>
+        </div>
     </div>
     <script src="popup.js"></script>
 </body>
