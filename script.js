@@ -14,9 +14,17 @@ const getSummary = async (text, links = []) => {
         if (links.length > 0) {
             linksSection = `\n\nLinks found on the page:\n${links.map(link => `- [${link.text}](${link.href})`).join('\n')}`;
         }
+
+        // Get settings from storage (note: in content script, use chrome.storage.sync)
+        const settings = await chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel']);
+        const model = settings.aiModel || MODEL;
+        const length = settings.summaryLength || 'medium';
+        const language = settings.outputLanguage || 'en';
+
+        const prompt = `Please summarize the following text in ${language}. Make it ${length} length: ${text}${linksSection}`;
         
         const jsonData = {
-            model: MODEL,
+            model: model,
             messages: [
                 {
                     role: 'assistant',
@@ -29,9 +37,7 @@ const getSummary = async (text, links = []) => {
                 },
                 {
                     role: 'user',
-                    content: 
-                    	`Please summarize the following 
-                        text: ${text}${linksSection}`,
+                    content: prompt,
                 },
             ],
         };

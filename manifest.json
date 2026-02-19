@@ -5,7 +5,8 @@
   "description": "Write a summary of the current active tab.",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "storage"
   ],
   "host_permissions": [
     "*://*.aimlapi.com/*"
@@ -24,6 +25,10 @@
     }
   }
   ,
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
   "icons": {
     "128": "icon128.png"
   }

@@ -3,8 +3,34 @@ window.addEventListener('DOMContentLoaded', () => {
     const textarea = document.getElementById('summary');
     const linksList = document.getElementById('links-list');
     const linksSection = document.getElementById('links-section');
+    const summarizeTab = document.getElementById('summarize-tab');
+    const historyTab = document.getElementById('history-tab');
+    const summarizeSection = document.getElementById('summarize-section');
+    const historySection = document.getElementById('history-section');
+    const historyList = document.getElementById('history-list');
+    const copyBtn = document.getElementById('copy-btn');
+    const downloadBtn = document.getElementById('download-btn');
+
+    // Tab switching
+    summarizeTab.addEventListener('click', () => {
+        summarizeTab.classList.add('active');
+        historyTab.classList.remove('active');
+        summarizeSection.style.display = 'block';
+        historySection.style.display = 'none';
+    });
+
+    historyTab.addEventListener('click', () => {
+        historyTab.classList.add('active');
+        summarizeTab.classList.remove('active');
+        summarizeSection.style.display = 'none';
+        historySection.style.display = 'block';
+        loadHistory();
+    });
 
     summarizeBtn.addEventListener('click', async () => {
+        if (summarizeBtn.innerText === 'Retry Summarize') {
+            summarizeBtn.innerText = 'Summarize';
+        }
         summarizeBtn.innerText = 'Summarizing...';
         summarizeBtn.disabled = true;
 
@@ -60,6 +86,21 @@ window.addEventListener('DOMContentLoaded', () => {
             const summary = await getSummary(pageData.text, pageData.links);
             textarea.value = summary;
 
+            // Save to history
+            const historyItem = {
+                id: Date.now(),
+                url: tab.url,
+                title: tab.title,
+                summary: summary,
+                date: new Date().toISOString()
+            };
+            chrome.storage.local.get(['summaries'], (result) => {
+                const summaries = result.summaries || [];
+                summaries.unshift(historyItem);
+                if (summaries.length > 50) summaries.pop(); // Keep only last 50
+                chrome.storage.local.set({ summaries });
+            });
+
             // Populate links section
             linksList.innerHTML = '';
             if (pageData.links && pageData.links.length > 0) {
@@ -82,12 +123,80 @@ window.addEventListener('DOMContentLoaded', () => {
             summarizeBtn.disabled = false;
         } catch (error) {
             console.error(error);
-            alert('An error occurred while summarizing. See console for details.');
-            summarizeBtn.innerText = 'Summarize';
+            let errorMessage = 'An error occurred while summarizing.';
+            if (error.message.includes('API request failed')) {
+                errorMessage = 'Failed to connect to AI service. Please check your internet connection.';
+            } else if (error.message.includes('rate limit')) {
+                errorMessage = 'API rate limit exceeded. Please try again later.';
+            }
+            alert(errorMessage + ' See console for details.');
+            summarizeBtn.innerText = 'Retry Summarize';
             summarizeBtn.disabled = false;
         }
     });
 });
+
+const loadHistory = () => {
+    chrome.storage.local.get(['summaries'], (result) => {
+        const summaries = result.summaries || [];
+        historyList.innerHTML = '';
+        if (summaries.length === 0) {
+            historyList.innerHTML = '<p>No summaries yet.</p>';
+            return;
+        }
+        summaries.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerHTML = `
+                <h4>${item.title}</h4>
+                <p><small>${new Date(item.date).toLocaleString()}</small></p>
+                <p>${item.summary.substring(0, 100)}...</p>
+                <button class="view-btn" data-id="${item.id}">View Full</button>
+                <button class="delete-btn" data-id="${item.id}">Delete</button>
+            `;
+            historyList.appendChild(div);
+        });
+
+        // Add event listeners for view and delete
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.target.dataset.id);
+                const item = summaries.find(s => s.id === id);
+                if (item) {
+                    textarea.value = item.summary;
+                    summarizeTab.click();
+                }
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.target.dataset.id);
+                const newSummaries = summaries.filter(s => s.id !== id);
+                chrome.storage.local.set({ summaries: newSummaries }, () => {
+                    loadHistory();
+                });
+            });
+        });
+    });
+
+    copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(textarea.value).then(() => {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => copyBtn.textContent = 'Copy to Clipboard', 2000);
+        });
+    });
+
+    downloadBtn.addEventListener('click', () => {
+        const blob = new Blob([textarea.value], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'summary.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+};
 
 // Define getSummary function here as well, or import it
 const AIML_API_KEY = '99bd4f0072414eabb3f62da667581f7b';
@@ -104,9 +213,17 @@ const getSummary = async (text, links = []) => {
         if (links.length > 0) {
             linksSection = `\n\nLinks found on the page:\n${links.map(link => `- [${link.text}](${link.href})`).join('\n')}`;
         }
+
+        // Get settings from storage
+        const settings = await chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel']);
+        const model = settings.aiModel || MODEL;
+        const length = settings.summaryLength || 'medium';
+        const language = settings.outputLanguage || 'en';
+
+        const prompt = `Please summarize the following text in ${language}. Make it ${length} length: ${text}${linksSection}`;
         
         const jsonData = {
-            model: MODEL,
+            model: model,
             messages: [
                 {
                     role: 'assistant',
@@ -119,9 +236,7 @@ const getSummary = async (text, links = []) => {
                 },
                 {
                     role: 'user',
-                    content: 
-                    	`Please summarize the following 
-                        text: ${text}${linksSection}`,
+                    content: prompt,
                 },
             ],
         };
