@@ -11,8 +11,8 @@ body {
 }
 
 .extension-popup {
-    width: 360px;
-    padding: 20px;
+    width: 320px;
+    padding: 16px;
     box-sizing: border-box;
     background: #1a1a1a;
     color: #ffffff;
@@ -140,13 +140,15 @@ body {
     color: #fff;
     border: none;
     border-radius: 8px;
-    padding: 12px 20px;
+    padding: 10px 16px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     display: block;
-    margin: 0 auto;
+    margin: 8px auto;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    max-width: 200px;
 }
 
 .buttons:hover {
@@ -164,13 +166,14 @@ body {
 
 .export-buttons {
     display: flex;
+    flex-direction: column;
     gap: 8px;
     margin-top: 16px;
 }
 
 .export-buttons .buttons {
-    flex: 1;
     margin: 0;
+    width: 100%;
 }
 
 .history-item {
@@ -279,6 +282,11 @@ body {
 @media (max-width: 450px) {
     .extension-popup {
         width: 100%;
-        padding: 16px;
+        padding: 12px;
         border-radius: 0;
     }
+    #summary-overlay {
+        max-width: 95vw;
+        max-height: 85vh;
+    }
+}
