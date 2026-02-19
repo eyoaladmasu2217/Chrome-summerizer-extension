@@ -1,85 +1,292 @@
-/* Google-inspired styles for Chrome Summarizer Extension */
+/* Inspired by Kome AI Summarizer: Modern, clean design with dark theme and card-based layout */
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-/* Overlay shown on page when selecting text */
-#summary-overlay {
-  max-width: 420px;
-  max-height: 600px;
-  overflow-y: auto;
-  cursor: pointer;
-  position: absolute;
-  border-radius: 8px;
-  background-color: #ffffff;
-  box-shadow: 0 6px 18px rgba(32, 33, 36, 0.22);
-  border: 1px solid #dadce0;
-  display: none;
-  flex-direction: column;
-  padding: 16px;
-  box-sizing: border-box;
-  z-index: 10000;
-  color: #202124;
-  font-size: 14px;
-  line-height: 1.5;
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', sans-serif;
 }
-@media (max-width: 600px) {
-    #summary-overlay { max-width: 90vw; max-height: 80vh; }
+
+.extension-popup {
+    width: 400px;
+    padding: 20px;
+    box-sizing: border-box;
+    background: #1a1a1a;
+    color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.extension-popup h1 {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    text-align: center;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    background: #2a2a2a;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: #cccccc;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.tab-button.active {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.card {
+    background: #2a2a2a;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #333;
+}
+
+.extension-popup #output {
+    color: #cccccc;
+    font-size: 14px;
+    margin: 8px 0 16px 0;
+    text-align: center;
+}
+
+.extension-popup .summary-field {
+    margin: 0 0 16px 0;
+}
+
+.extension-popup textarea {
+    width: 100%;
+    height: 140px;
+    font-size: 14px;
+    color: #ffffff;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 12px;
+    resize: vertical;
+    background: #1a1a1a;
+    transition: border-color 0.3s ease;
+}
+
+.extension-popup textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.extension-popup .links-section {
+    margin-top: 16px;
+}
+
+.extension-popup .links-section h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.extension-popup .links-section ul {
+    margin: 0;
+    padding-left: 16px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.extension-popup .links-section li {
+    margin-bottom: 6px;
+}
+
+.extension-popup .links-section a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.extension-popup .links-section a:hover {
+    text-decoration: underline;
+}
+
+.buttons {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.buttons:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.buttons:disabled {
+    background: #444;
+    color: #666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.export-buttons .buttons {
+    flex: 1;
+    margin: 0;
+}
+
+.history-item {
+    background: #2a2a2a;
+    border: 1px solid #333;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+.history-item:hover {
+    background: #333;
+}
+
+.history-item h4 {
+    margin: 0 0 6px 0;
+    color: #ffffff;
+}
+
+.history-item p {
+    margin: 4px 0;
+    color: #cccccc;
+}
+
+.history-item button {
+    margin-right: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    background: #444;
+    color: #cccccc;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.history-item button:hover {
+    background: #555;
+}
+
+/* Overlay inspired by Kome's clean overlay */
+#summary-overlay {
+    max-width: 450px;
+    max-height: 650px;
+    overflow-y: auto;
+    cursor: pointer;
+    position: absolute;
+    border-radius: 12px;
+    background: #1a1a1a;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 1px solid #333;
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 10000;
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 #summary-overlay button {
-  background-color: #1a73e8;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 12px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-bottom: 12px;
-  align-self: flex-start;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    margin-bottom: 12px;
+    align-self: flex-start;
 }
 
-#summary-overlay button:hover { background-color: #1557b0; }
-#summary-overlay button:disabled { background-color: #dadce0; color: #5f6368; cursor: not-allowed; }
-
-#summary-overlay .summary-content { margin-top: 12px; padding: 12px; background-color: #f1f3f4; border-radius: 4px; border-left: 4px solid #1a73e8; }
-
-#summary-overlay h1, #summary-overlay h2, #summary-overlay h3 { color: #202124; margin: 0 0 8px 0; font-weight: 500; }
-#summary-overlay p, #summary-overlay li { color: #5f6368; }
-
-/* Popup (scoped) styles - will only apply when wrapper .extension-popup exists */
-.extension-popup { font-family: 'Roboto', sans-serif; width: 360px; padding: 14px; box-sizing: border-box; background: #ffffff; color: #202124; max-width: 100vw; }
-@media (max-width: 400px) {
-    .extension-popup { width: 100%; padding: 10px; }
-    .extension-popup textarea { width: 100%; }
-    .export-buttons { display: flex; flex-direction: column; gap: 8px; }
+#summary-overlay button:hover {
+    transform: translateY(-2px);
 }
-.extension-popup h1 { color: #202124; font-size: 18px; font-weight: 500; margin: 0 0 10px 0; text-align: center; }
-.extension-popup #output { color: #5f6368; font-size: 13px; margin: 8px 0 12px 0; text-align: center; }
-.extension-popup .summary-field { display: block; margin: 0 0 12px 0; }
-.extension-popup textarea { width: 100%; height: 130px; font-size: 13px; color: #202124; border: 1px solid #dadce0; border-radius: 6px; padding: 10px; resize: vertical; background: #fff; transition: box-shadow .15s ease; }
-.extension-popup textarea:focus { outline: none; box-shadow: 0 4px 14px rgba(26,115,232,0.12); border-color: #1a73e8; }
-.extension-popup .buttons { background-color: #1a73e8; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-size: 14px; font-weight: 500; cursor: pointer; display: block; margin: 0 auto; }
-.extension-popup .buttons:hover { background-color: #1557b0; }
-.extension-popup .buttons:disabled { background-color: #dadce0; color: #5f6368; cursor: not-allowed; }
 
-.extension-popup .links-section { margin-top: 12px; }
-.extension-popup .links-section h3 { margin: 0 0 6px 0; font-size: 14px; }
-.extension-popup .links-section ul { margin: 0; padding-left: 18px; max-height: 120px; overflow-y: auto; }
-.extension-popup .links-section li { margin-bottom: 6px; }
-.extension-popup .links-section a { color: #1a73e8; text-decoration: none; }
-.extension-popup .links-section a:hover { text-decoration: underline; }
+#summary-overlay button:disabled {
+    background: #444;
+    color: #666;
+    cursor: not-allowed;
+    transform: none;
+}
 
-/* Tabs */
-.tabs { display: flex; margin-bottom: 12px; }
-.tab-button { flex: 1; padding: 8px; border: none; background: #f1f3f4; cursor: pointer; }
-.tab-button.active { background: #1a73e8; color: white; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+#summary-overlay .summary-content {
+    margin-top: 12px;
+    padding: 16px;
+    background: #2a2a2a;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
 
-/* History */
-.history-item { border: 1px solid #dadce0; padding: 8px; margin-bottom: 8px; border-radius: 4px; }
-.history-item h4 { margin: 0 0 4px 0; }
-.history-item p { margin: 4px 0; }
-.history-item button { margin-right: 8px; padding: 4px 8px; font-size: 12px; }
+#summary-overlay h1, #summary-overlay h2, #summary-overlay h3 {
+    color: #ffffff;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+}
+
+#summary-overlay p, #summary-overlay li {
+    color: #cccccc;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 450px) {
+    .extension-popup {
+        width: 100%;
+        padding: 16px;
+        border-radius: 0;
+    }
+    #summary-overlay {
+        max-width: 95vw;
+        max-height: 85vh;
+    }
+    .export-buttons {
+        flex-direction: column;
+    }
+}
