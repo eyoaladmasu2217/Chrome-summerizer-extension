@@ -114,6 +114,10 @@ body.light-mode .extension-popup #output {
     color: #666666;
 }
 
+body.light-mode .extension-popup #reading-time {
+    color: #666666;
+}
+
 .extension-popup .summary-field {
     margin: 0 0 16px 0;
 }

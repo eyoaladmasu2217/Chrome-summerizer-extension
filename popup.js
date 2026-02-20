@@ -16,6 +16,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const copyBtn = document.getElementById('copy-btn');
     const downloadBtn = document.getElementById('download-btn');
     const pdfBtn = document.getElementById('pdf-btn');
+    const readingTime = document.getElementById('reading-time');
 
     // Tab switching
     summarizeTab.addEventListener('click', () => {
@@ -88,6 +89,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 summarizeBtn.disabled = false;
                 return;
             }
+
+            // Calculate reading time
+            const wordCount = pageData.text.trim().split(/\s+/).length;
+            const readingTimeMinutes = Math.ceil(wordCount / 200); // Average 200 words per minute
+            readingTime.textContent = `Estimated reading time: ${readingTimeMinutes} minute${readingTimeMinutes !== 1 ? 's' : ''}`;
+            readingTime.style.display = 'block';
 
             const summary = await getSummary(pageData.text, pageData.links);
             textarea.value = summary;
