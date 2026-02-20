@@ -17,6 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const downloadBtn = document.getElementById('download-btn');
     const pdfBtn = document.getElementById('pdf-btn');
     const readingTime = document.getElementById('reading-time');
+    const shareBtn = document.getElementById('share-btn');
 
     // Tab switching
     summarizeTab.addEventListener('click', () => {
@@ -225,6 +226,25 @@ const loadHistory = () => {
         
         // Save the PDF
         doc.save('summary.pdf');
+    });
+
+    shareBtn.addEventListener('click', () => {
+        const summaryData = encodeURIComponent(textarea.value);
+        const shareUrl = `data:text/html;charset=utf-8,${encodeURIComponent(`
+<!DOCTYPE html>
+<html>
+<head><title>Shared Summary</title></head>
+<body>
+<h1>Shared Page Summary</h1>
+<pre>${textarea.value}</pre>
+</body>
+</html>
+`)}`;
+        
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            shareBtn.textContent = 'Link Copied!';
+            setTimeout(() => shareBtn.textContent = 'Share', 2000);
+        });
     });
 };
 
