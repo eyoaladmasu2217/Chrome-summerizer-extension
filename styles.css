@@ -10,6 +10,10 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
+body.light-mode {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
 .extension-popup {
     width: 320px;
     padding: 16px;
@@ -20,6 +24,12 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     max-height: 600px;
     overflow-y: auto;
+}
+
+body.light-mode .extension-popup {
+    background: #ffffff;
+    color: #333333;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .extension-popup h1 {
@@ -34,12 +44,21 @@ body {
     background-clip: text;
 }
 
+body.light-mode .extension-popup h1 {
+    color: #333333;
+    -webkit-text-fill-color: #333333;
+}
+
 .tabs {
     display: flex;
     margin-bottom: 20px;
     background: #2a2a2a;
     border-radius: 8px;
     padding: 4px;
+}
+
+body.light-mode .tabs {
+    background: #e0e0e0;
 }
 
 .tab-button {
@@ -52,6 +71,10 @@ body {
     border-radius: 6px;
     transition: all 0.3s ease;
     font-weight: 500;
+}
+
+body.light-mode .tab-button {
+    color: #666666;
 }
 
 .tab-button.active {
@@ -75,11 +98,20 @@ body {
     border: 1px solid #333;
 }
 
+body.light-mode .card {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+}
+
 .extension-popup #output {
     color: #cccccc;
     font-size: 14px;
     margin: 8px 0 16px 0;
     text-align: center;
+}
+
+body.light-mode .extension-popup #output {
+    color: #666666;
 }
 
 .extension-popup .summary-field {
@@ -99,6 +131,12 @@ body {
     transition: border-color 0.3s ease;
 }
 
+body.light-mode .extension-popup textarea {
+    color: #333333;
+    border: 1px solid #ccc;
+    background: #ffffff;
+}
+
 .extension-popup textarea:focus {
     outline: none;
     border-color: #667eea;
@@ -113,6 +151,10 @@ body {
     margin: 0 0 8px 0;
     font-size: 16px;
     color: #ffffff;
+}
+
+body.light-mode .extension-popup .links-section h3 {
+    color: #333333;
 }
 
 .extension-popup .links-section ul {
@@ -185,8 +227,17 @@ body {
     transition: background 0.3s ease;
 }
 
+body.light-mode .history-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+}
+
 .history-item:hover {
     background: #333;
+}
+
+body.light-mode .history-item:hover {
+    background: #e0e0e0;
 }
 
 .history-item h4 {
@@ -194,9 +245,17 @@ body {
     color: #ffffff;
 }
 
+body.light-mode .history-item h4 {
+    color: #333333;
+}
+
 .history-item p {
     margin: 4px 0;
     color: #cccccc;
+}
+
+body.light-mode .history-item p {
+    color: #666666;
 }
 
 .history-item button {
@@ -210,8 +269,17 @@ body {
     cursor: pointer;
 }
 
+body.light-mode .history-item button {
+    background: #e0e0e0;
+    color: #333333;
+}
+
 .history-item button:hover {
     background: #555;
+}
+
+body.light-mode .history-item button:hover {
+    background: #cccccc;
 }
 
 /* Overlay inspired by Kome's clean overlay */
@@ -233,6 +301,13 @@ body {
     color: #ffffff;
     font-size: 14px;
     line-height: 1.5;
+}
+
+body.light-mode #summary-overlay {
+    background: #ffffff;
+    color: #333333;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
 }
 
 #summary-overlay button {
@@ -268,14 +343,29 @@ body {
     border-left: 4px solid #667eea;
 }
 
+body.light-mode #summary-overlay .summary-content {
+    background: #f9f9f9;
+}
+
 #summary-overlay h1, #summary-overlay h2, #summary-overlay h3 {
     color: #ffffff;
     margin: 0 0 8px 0;
     font-weight: 600;
 }
 
+body.light-mode #summary-overlay h1,
+body.light-mode #summary-overlay h2,
+body.light-mode #summary-overlay h3 {
+    color: #333333;
+}
+
 #summary-overlay p, #summary-overlay li {
     color: #cccccc;
+}
+
+body.light-mode #summary-overlay p,
+body.light-mode #summary-overlay li {
+    color: #666666;
 }
 
 /* Mobile responsiveness */

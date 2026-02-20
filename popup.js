@@ -1,4 +1,9 @@
 window.addEventListener('DOMContentLoaded', () => {
+    // Load dark mode setting
+    chrome.storage.sync.get(['darkMode'], (result) => {
+        const darkMode = result.darkMode || false;
+        document.body.classList.toggle('light-mode', !darkMode);
+    });
     const summarizeBtn = document.getElementById('summarize-btn');
     const textarea = document.getElementById('summary');
     const linksList = document.getElementById('links-list');
