@@ -243,7 +243,7 @@ const getSummary = async (text, links = []) => {
         const length = settings.summaryLength || 'medium';
         const language = settings.outputLanguage || 'en';
 
-        const prompt = `Please summarize the following text in ${language}. Make it ${length} length: ${text}${linksSection}`;
+        const prompt = `Please summarize the following text in ${language}. Make it ${length} length. Also extract 5-7 key keywords or phrases from the text and include them at the top of the summary in bold. Format the summary with proper HTML tags for headings and paragraphs: ${text}${linksSection}`;
         
         const jsonData = {
             model: model,
@@ -255,7 +255,9 @@ const getSummary = async (text, links = []) => {
                         provides summaries for long texts. 
                         You are using HTML tags to format 
                         your response. Include a "Links" section 
-                        at the end if links are provided.`,
+                        at the end if links are provided.
+                        Always extract 5-7 key keywords or phrases 
+                        and list them in bold at the top of the summary.`,
                 },
                 {
                     role: 'user',
