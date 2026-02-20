@@ -15,6 +15,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const historyList = document.getElementById('history-list');
     const copyBtn = document.getElementById('copy-btn');
     const downloadBtn = document.getElementById('download-btn');
+    const pdfBtn = document.getElementById('pdf-btn');
 
     // Tab switching
     summarizeTab.addEventListener('click', () => {
@@ -200,6 +201,23 @@ const loadHistory = () => {
         a.download = 'summary.txt';
         a.click();
         URL.revokeObjectURL(url);
+    });
+
+    pdfBtn.addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Add title
+        doc.setFontSize(20);
+        doc.text('Page Summary', 20, 30);
+        
+        // Add summary text
+        doc.setFontSize(12);
+        const lines = doc.splitTextToSize(textarea.value, 170);
+        doc.text(lines, 20, 50);
+        
+        // Save the PDF
+        doc.save('summary.pdf');
     });
 };
 
