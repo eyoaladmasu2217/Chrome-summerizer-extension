@@ -154,19 +154,25 @@ const handleSummarize = async () => {
         // Display links
         linksList.innerHTML = '';
         if (pageData.links?.length > 0) {
-            pageData.links.slice(0, 10).forEach(link => {
-                const li = document.createElement('li');
+            pageData.links.forEach(link => {
                 const a = document.createElement('a');
+                a.className = 'link-card';
                 a.href = link.href;
-                a.textContent = link.text || link.href;
                 a.target = '_blank';
-                li.appendChild(a);
-                linksList.appendChild(li);
+                a.innerHTML = `
+                    <span class="link-title">${link.text || 'Untitled Link'}</span>
+                    <span class="link-host">
+                        <i class="material-icons-round" style="font-size: 12px;">link</i>
+                        ${link.hostname || 'link'}
+                    </span>
+                `;
+                linksList.appendChild(a);
             });
             linksSection.style.display = 'block';
         } else {
             linksSection.style.display = 'none';
         }
+
 
     } catch (error) {
         console.error('Summary error:', error);
@@ -183,22 +189,37 @@ const getPageData = (tabId) => {
             if (!chrome.runtime.lastError && response) {
                 return resolve(response);
             }
-            // Fallback
             chrome.scripting.executeScript({
                 target: { tabId },
                 func: () => {
                     const text = document.body.innerText || '';
+                    const seen = new Set();
                     const links = Array.from(document.querySelectorAll('a[href]'))
-                        .map(a => ({ text: a.textContent.trim(), href: a.href }))
-                        .filter(l => l.text && l.href.startsWith('http'));
-                    return { text: text.trim(), links };
+                        .map(a => ({
+                            text: a.textContent.trim(),
+                            href: a.href,
+                            hostname: new URL(a.href).hostname
+                        }))
+                        .filter(l => {
+                            const isNew = !seen.has(l.href);
+                            const isWeb = l.href.startsWith('http');
+                            const hasText = l.text.length > 2;
+                            if (isNew && isWeb && hasText) {
+                                seen.add(l.href);
+                                return true;
+                            }
+                            return false;
+                        })
+                        .slice(0, 20);
+                    return { text: text.trim(), links, title: document.title };
                 }
             }, (results) => {
-                resolve(results?.[0]?.result || { text: '', links: [] });
+                resolve(results?.[0]?.result || { text: '', links: [], title: '' });
             });
         });
     });
 };
+
 
 const getSummary = async (text, links = []) => {
     const settings = await chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel']);
