@@ -32,7 +32,7 @@ const initTabs = () => {
         inactiveTab.setAttribute('aria-selected', 'false');
         activeSection.style.display = 'block';
         inactiveSection.style.display = 'none';
-        
+
         if (activeTab.id === 'history-tab') {
             loadHistory();
         }
@@ -48,10 +48,19 @@ const initEventListeners = () => {
     const downloadBtn = document.getElementById('download-btn');
     const pdfBtn = document.getElementById('pdf-btn');
     const shareBtn = document.getElementById('share-btn');
+    const settingsTrigger = document.getElementById('settings-trigger');
     const textarea = document.getElementById('summary');
 
     summarizeBtn.addEventListener('click', handleSummarize);
-    
+
+    settingsTrigger.addEventListener('click', () => {
+        if (chrome.runtime.openOptionsPage) {
+            chrome.runtime.openOptionsPage();
+        } else {
+            window.open(chrome.runtime.getURL('options.html'));
+        }
+    });
+
     copyBtn.addEventListener('click', () => {
         const text = textarea.value;
         if (!text) return;
@@ -135,7 +144,7 @@ const handleSummarize = async () => {
             summary: summary,
             date: new Date().toISOString()
         };
-        
+
         chrome.storage.local.get(['summaries'], (result) => {
             const summaries = result.summaries || [];
             summaries.unshift(historyItem);
@@ -231,9 +240,9 @@ const loadHistory = () => {
     chrome.storage.local.get(['summaries'], (result) => {
         const historyList = document.getElementById('history-list');
         const summaries = result.summaries || [];
-        
+
         historyList.innerHTML = summaries.length === 0 ? '<p class="empty-msg">No history yet.</p>' : '';
-        
+
         summaries.forEach(item => {
             const div = document.createElement('div');
             div.className = 'history-item';
@@ -255,7 +264,7 @@ const loadHistory = () => {
         historyList.onclick = (e) => {
             const btn = e.target.closest('button');
             if (!btn) return;
-            
+
             const id = parseInt(btn.dataset.id);
             if (btn.classList.contains('view-btn')) {
                 const item = summaries.find(s => s.id === id);

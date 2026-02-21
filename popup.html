@@ -3,41 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summerizer</title>
+    <title>Summarize AI</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="extension-popup">
-        <h1>Text Summarizer</h1>
-        <div class="tabs" role="tablist">
-            <button id="summarize-tab" class="tab-button active" role="tab" aria-selected="true" aria-controls="summarize-section">Summarize</button>
-            <button id="history-tab" class="tab-button" role="tab" aria-selected="false" aria-controls="history-section">History</button>
-        </div>
-        <div id="summarize-section" class="tab-content active" role="tabpanel" aria-labelledby="summarize-tab">
-            <div id="output">Click the button to summarize the current webpage.</div>
-            <div id="reading-time" style="display:none; color: #cccccc; font-size: 12px; text-align: center; margin-bottom: 8px;"></div>
-            <div id="summary-area" class="summary-field">
-                <textarea id="summary" rows="10" cols="50" readonly placeholder="Summary will appear here..." aria-label="Summary output"></textarea>
+        <header class="header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="material-icons-round">bolt</i>
+                </div>
+                <h1>Summarize AI</h1>
+            </div>
+            <div class="header-actions">
+                <button id="settings-trigger" class="icon-btn" title="Settings">
+                    <i class="material-icons-round">settings</i>
+                </button>
+            </div>
+        </header>
+
+        <nav class="tabs" role="tablist">
+            <button id="summarize-tab" class="tab-button active" role="tab" aria-selected="true" aria-controls="summarize-section">
+                <i class="material-icons-round">description</i>
+                Summarize
+            </button>
+            <button id="history-tab" class="tab-button" role="tab" aria-selected="false" aria-controls="history-section">
+                <i class="material-icons-round">history</i>
+                History
+            </button>
+        </nav>
+
+        <main id="summarize-section" class="tab-content active" role="tabpanel" aria-labelledby="summarize-tab">
+            <div id="reading-time" style="display:none;"></div>
+            
+            <div class="summary-field">
+                <textarea id="summary" readonly placeholder="The AI summary will appear here once you click the button below..." aria-label="Summary output"></textarea>
             </div>
 
             <div id="links-section" class="links-section" style="display:none;">
-                <h3>Links</h3>
+                <h3>Key Links Extracted</h3>
                 <ul id="links-list" aria-label="Extracted links"></ul>
             </div>
 
-            <button id="summarize-btn" class="buttons" aria-label="Summarize current page"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">description</i>Summarize</button>
-            <button id="test-ai-btn" class="buttons" style="margin-top:8px;background:#34a853;" aria-label="Test AI connection"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">smart_toy</i>Test AI</button>
-            <div class="export-buttons" style="margin-top:12px;">
-                <button id="copy-btn" class="buttons" style="background:#fbbc04;" aria-label="Copy summary to clipboard"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">content_copy</i>Copy</button>
-                <button id="download-btn" class="buttons" style="background:#ea4335;" aria-label="Download summary as text file"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">download</i>Download</button>                <button id="pdf-btn" class="buttons" style="background:#db4437;" aria-label="Download summary as PDF"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">picture_as_pdf</i>PDF</button>
-                <button id="share-btn" class="buttons" style="background:#1da1f2;" aria-label="Share summary link"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">share</i>Share</button>
+            <div class="main-actions">
+                <button id="summarize-btn" class="buttons" aria-label="Summarize current page">
+                    <i class="material-icons-round">auto_awesome</i>
+                    Generate Summary
+                </button>
+                
+                <div class="export-grid">
+                    <button id="copy-btn" class="buttons" aria-label="Copy to clipboard">
+                        <i class="material-icons-round">content_copy</i>
+                        Copy
+                    </button>
+                    <button id="download-btn" class="buttons" aria-label="Download TXT">
+                        <i class="material-icons-round">download</i>
+                        Text
+                    </button>
+                    <button id="pdf-btn" class="buttons" aria-label="Download PDF">
+                        <i class="material-icons-round">picture_as_pdf</i>
+                        PDF
+                    </button>
+                    <button id="share-btn" class="buttons" aria-label="Share summary">
+                        <i class="material-icons-round">share</i>
+                        Share
+                    </button>
+                </div>
             </div>
-        </div>
-        <div id="history-section" class="tab-content" style="display:none;" role="tabpanel" aria-labelledby="history-tab">
-            <h3>Summary History</h3>
-            <div id="history-list" aria-label="List of previous summaries"></div>
-        </div>
+        </main>
+
+        <section id="history-section" class="tab-content" style="display:none;" role="tabpanel" aria-labelledby="history-tab">
+            <div id="history-list" aria-label="Summary history"></div>
+        </section>
     </div>
     <script src="popup.js"></script>
 </body>
