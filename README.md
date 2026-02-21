@@ -1,73 +1,39 @@
-# Chrome Text Summarizer Extension
+# Summarize AI - Premium Chrome Extension
 
-A powerful Chrome extension that leverages AI to provide intelligent summaries of web content. Extract key insights from entire webpages or selected text passages with a clean interface.
+Summarize AI is a state-of-the-art Chrome extension designed to help you consume web content faster and more efficiently. Using advanced artificial intelligence, it provides structured, high-quality summaries of any webpage or selected text.
 
-## Features
+## ✨ Features
 
-- **Full Page Summarization**: Click the extension icon to summarize the entire content of the current active tab
-- **Selective Text Summarization**: Highlight any text (200-7000 characters) on a webpage to get a focused summary
-- **Link Extraction**: Automatically identifies and includes all hyperlinks from the page in the summary
-- **AI-Powered**: Uses advanced natural language processing via AIML API for high-quality summaries
-- **Modern UI**: Clean, professional interface
-- **HTML Formatting**: Summaries include proper formatting with headings, lists, and structured content
+- **🚀 Active Tab Summarization**: Get a professional-grade summary of the current tab in seconds.
+- **💡 Smart Analysis**: Structured summaries with key takeaways, main points, and extracted references.
+- **🖱️ Selection Summarizer**: Highlight any text on a page to get a quick, concise summary in a beautiful floating overlay.
+- **🔗 Link Extraction**: Automatically fetches and organizes the most important links from the page into a clean card-based UI.
+- **📜 Smart History**: Keeps track of your previous summaries so you can revisit them anytime.
+- **📤 Versatile Export**: Export your summaries as high-quality PDFs, Text files, or shareable HTML links.
+- **🎨 Premium UI/UX**: Stunning Glassmorphism-inspired design with full Dark Mode support and smooth micro-animations.
+- **🌍 Multilingual**: Supports summarization in 8 different languages.
+- **⚙️ Advanced Settings**: Choose from multiple AI models including GPT-4o and Claude 3.5 Sonnet.
 
-## Installation
+## 🛠️ Installation
 
-1. Download or clone this repository
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode" in the top right corner
-4. Click "Load unpacked" and select the `Chrome-summerizer-extension` folder
-5. The extension will appear in your Chrome toolbar
+1. Download or clone this repository.
+2. Open Chrome and navigate to `chrome://extensions/`.
+3. Enable "Developer mode" in the top right corner.
+4. Click "Load unpacked" and select the extension directory.
 
-## Usage
+## 🚀 How to Use
 
-### Summarizing an Entire Page
-1. Navigate to any webpage you want to summarize
-2. Click the Text Summarizer extension icon in your Chrome toolbar
-3. Click the "Summarize" button in the popup
-4. The AI-generated summary will appear in the text area, including all links found on the page
+- **Popup**: Click the extension icon to summarize the current page or view history.
+- **Selection**: Highlight any text on a webpage (minimum 50 characters) to see the floating "Summarize Selection" button.
+- **Settings**: Click the gear icon in the popup to configure your preferred engine and language.
 
-### Summarizing Selected Text
-1. On any webpage, highlight a portion of text (between 200-7000 characters)
-2. An overlay will automatically appear with a "Summarize" button
-3. Click the button to get a summary of just the selected text
-4. The summary displays in a clean overlay on the page
+## 🧱 Technical Highlights
 
-## How It Works
+- **Frontend**: Vanilla Javascript, HTML5, CSS3 (Glassmorphism, Flexbox, Grid).
+- **AI Integration**: Powered by AIML API (Compatible with OpenAI/Claude schemas).
+- **Libraries**: [jsPDF](https://github.com/parallax/jsPDF) for professional document generation.
+- **Manifest**: MV3 compliant for security and performance.
 
-The extension uses the AIML API to process text content through advanced AI models. When summarizing:
+## 📄 License
 
-- **Page Content**: Extracts all readable text from `document.body`
-- **Links**: Collects all anchor tags with valid HTTP/HTTPS URLs
-- **AI Processing**: Sends content to AIML API with structured prompts for comprehensive summaries
-- **Output**: Returns HTML-formatted summaries with proper headings, paragraphs, and link sections
-
-## Requirements
-
-- Google Chrome browser
-- Internet connection for API calls
-- Valid AIML API key (configured in `popup.js` and `script.js`)
-
-## File Structure
-
-```
-Chrome-summerizer-extension/
-├── manifest.json      # Chrome extension manifest
-├── popup.html         # Extension popup interface
-├── popup.js           # Popup functionality and API integration
-├── script.js          # Content script for text selection overlay
-├── styles.css         # styling
-└── README.md          # This file
-```
-
-## Privacy
-
-- All text processing occurs locally in your browser
-- Content is sent to AIML API for summarization only
-- No personal data or browsing history is stored
-- API calls are made securely over HTTPS
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues or pull requests.
-
+MIT License - feel free to build upon this project!
