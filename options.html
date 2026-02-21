@@ -1,45 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Summarizer Settings</title>
+    <title>Summarize AI Settings</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            width: 500px;
+            padding: 40px;
+            margin: 0 auto;
+            background: var(--bg-dark);
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .setting-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        select,
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--primary);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-group input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+        }
+
+        #status {
+            text-align: center;
+            font-size: 13px;
+            color: var(--success);
+            margin-top: 20px;
+            min-height: 20px;
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="extension-popup">
-        <h1>Settings</h1>
+    <div class="settings-card">
+        <header class="header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="material-icons-round">settings</i>
+                </div>
+                <h1>Settings</h1>
+            </div>
+        </header>
+
         <form id="settings-form">
-            <label for="summary-length">Summary Length:</label>
-            <select id="summary-length">
-                <option value="short">Short</option>
-                <option value="medium">Medium</option>
-                <option value="long">Long</option>
-            </select>
+            <div class="setting-group">
+                <label for="summary-length">Preferred Summary Length</label>
+                <select id="summary-length">
+                    <option value="short">Short & Punchy</option>
+                    <option value="medium" selected>Balanced (Standard)</option>
+                    <option value="long">Comprehensive Detail</option>
+                </select>
+            </div>
 
-            <label for="output-language">Output Language:</label>
-            <select id="output-language">
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-                <option value="de">German</option>
-            </select>
+            <div class="setting-group">
+                <label for="output-language">Output Language</label>
+                <select id="output-language">
+                    <option value="en">English (US/UK)</option>
+                    <option value="es">Spanish (Español)</option>
+                    <option value="fr">French (Français)</option>
+                    <option value="de">German (Deutsch)</option>
+                    <option value="it">Italian (Italiano)</option>
+                    <option value="pt">Portuguese (Português)</option>
+                    <option value="ja">Japanese (日本語)</option>
+                    <option value="zh">Chinese (中文)</option>
+                </select>
+            </div>
 
-            <label for="ai-model">AI Model:</label>
-            <select id="ai-model">
-                <option value="Summerizer">Summerizer</option>
-                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-            </select>
+            <div class="setting-group">
+                <label for="ai-model">AI Engine <span class="premium-badge">PRO</span></label>
+                <select id="ai-model">
+                    <option value="Summerizer">Summarize Native (Default)</option>
+                    <option value="gpt-4o">GPT-4o (High Precision)</option>
+                    <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Fast)</option>
+                </select>
+            </div>
 
-            <label for="dark-mode" style="display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="dark-mode">
-                Dark Mode
-            </label>
+            <div class="setting-group">
+                <label class="checkbox-group">
+                    <input type="checkbox" id="dark-mode" checked>
+                    <span>Enable Dark Mode Aesthetics</span>
+                </label>
+            </div>
 
-            <button type="submit" class="buttons">Save Settings</button>
+            <button type="submit" class="buttons" id="save-btn">
+                <i class="material-icons-round">save</i>
+                Save Configuration
+            </button>
         </form>
         <div id="status"></div>
     </div>
     <script src="options.js"></script>
 </body>
+
 </html>
