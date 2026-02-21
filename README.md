@@ -10,18 +10,18 @@
 
 ## 💎 Core Capabilities
 
-### � Intelligent Web Summarization
+### 📄 Intelligent Web Summarization
 Transform any webpage into a structured report with a single click. Our AI identifies:
 - **💡 Key Takeaways**: 3-5 high-impact bullet points with contextual emojis.
 - **📝 Core Summary**: A balanced overview tailored to your preferred length.
-- **� Contextual References**: Natural integration of relevant sources found on the page.
+- **🔗 Contextual References**: Natural integration of relevant sources found on the page.
 
 ### 🖱️ Smart Selection Overlay
 Highlight any snippet (>50 characters) to trigger the **Summarize Selection** engine. A beautifully animated glassmorphism overlay provides instant insights without leaving your reading flow.
 
-### � Deep Link Discovery
+### 🔗 Deep Link Discovery
 Automatically crawls the active DOM to extract and categorize unique web links.
-- **Unique Filtering**: Avoids duplicate and "junk" links (javascript:void, etc.).
+- **Unique Filtering**: Avoids duplicate and "junk" links (javascript:void(0), etc.).
 - **Card-based UI**: Displays links with their respective hostnames and metadata.
 - **Top 20 Extraction**: Prioritizes key navigational and reference content.
 
@@ -49,7 +49,7 @@ Tailor the extension to your specific needs via the **Options Dashboard**:
 
 ---
 
-## �️ Technical Architecture
+## 🛠️ Technical Architecture
 
 | Component | Technology | Role |
 | :--- | :--- | :--- |
