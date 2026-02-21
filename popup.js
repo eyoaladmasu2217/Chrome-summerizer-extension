@@ -83,30 +83,44 @@ const initEventListeners = () => {
     });
 
     pdfBtn.addEventListener('click', () => {
-        if (!textarea.value) return;
+        const text = textarea.value;
+        if (!text) return;
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFontSize(20);
-        doc.text('Page Summary', 20, 30);
+
+        doc.setFillColor(99, 102, 241);
+        doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.text('Summarize AI Analytics', 20, 28);
+
+        doc.setTextColor(148, 163, 184);
+        doc.setFontSize(10);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 50);
+
+        doc.setTextColor(30, 41, 59);
         doc.setFontSize(12);
-        const lines = doc.splitTextToSize(textarea.value, 170);
-        doc.text(lines, 20, 50);
+        const lines = doc.splitTextToSize(text, 170);
+        doc.text(lines, 20, 65);
+
         doc.save(`summary-${Date.now()}.pdf`);
     });
 
     shareBtn.addEventListener('click', () => {
-        if (!textarea.value) return;
-        const shareUrl = `data:text/html;charset=utf-8,${encodeURIComponent(`
-            <!DOCTYPE html><html><head><title>Shared Summary</title><style>body{font-family:sans-serif;padding:40px;line-height:1.6;max-width:800px;margin:0 auto;}</style></head>
-            <body><h1>Shared Page Summary</h1><hr/><pre style="white-space:pre-wrap;">${textarea.value}</pre></body></html>
-        `)}`;
+        const text = textarea.value;
+        if (!text) return;
+
+        const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Summarize AI Recap</title><style>body{font-family:sans-serif;background:#f8fafc;padding:40px;color:#0f172a;line-height:1.6;} .card{background:white;padding:40px;border-radius:24px;box-shadow:0 10px 40px rgba(0,0,0,0.05);max-width:800px;margin:0 auto;} h1{color:#6366f1;margin-top:0;} pre{white-space:pre-wrap;font-family:inherit;}</style></head><body><div class="card"><h1>Recap</h1><pre>${text}</pre></div></body></html>`;
+        const shareUrl = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+
         navigator.clipboard.writeText(shareUrl).then(() => {
-            const originalText = shareBtn.innerHTML;
-            shareBtn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 8px;">link</i>Link Copied!';
-            setTimeout(() => shareBtn.innerHTML = originalText, 2000);
+            const original = shareBtn.innerHTML;
+            shareBtn.innerHTML = '<i class="material-icons-round">link</i> Link Copied';
+            setTimeout(() => shareBtn.innerHTML = original, 2000);
         });
     });
 };
+
 
 const handleSummarize = async () => {
     const summarizeBtn = document.getElementById('summarize-btn');
