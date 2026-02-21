@@ -46,16 +46,33 @@ const createSummaryOverlay = () => {
     overlay = document.createElement('div');
     overlay.id = 'summary-overlay';
 
+    // Load dark mode
+    chrome.storage.sync.get(['darkMode'], (result) => {
+        if (result.darkMode === false) {
+            overlay.classList.add('light-mode');
+        }
+    });
+
+    // Inject Material Icons if not present
+    if (!document.getElementById('summarize-ai-icons')) {
+        const link = document.createElement('link');
+        link.id = 'summarize-ai-icons';
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons+Round';
+        document.head.appendChild(link);
+    }
+
     const summaryButton = document.createElement('button');
     summaryButton.id = 'summary-button';
-    summaryButton.textContent = 'Summarize Selection';
+    summaryButton.innerHTML = '<i class="material-icons-round" style="font-size: 16px;">auto_awesome</i> Summarize Selection';
 
     overlay.appendChild(summaryButton);
     document.body.appendChild(overlay);
 
     summaryButton.addEventListener('click', async (e) => {
         e.stopPropagation();
-        summaryButton.textContent = 'Summarizing...';
+        const originalContent = summaryButton.innerHTML;
+        summaryButton.innerHTML = '<i class="material-icons-round" style="font-size: 16px;">sync</i> Summarizing...';
         summaryButton.disabled = true;
 
         try {
@@ -67,14 +84,15 @@ const createSummaryOverlay = () => {
             content.className = 'summary-content';
             content.innerHTML = summary.replace(/\n/g, '<br>');
             overlay.appendChild(content);
-            summaryButton.textContent = 'Summarize Selection';
+            summaryButton.innerHTML = originalContent;
         } catch (error) {
-            summaryButton.textContent = 'Error - Try Again';
+            summaryButton.innerHTML = '<i class="material-icons-round" style="font-size: 16px;">error</i> Error - Try Again';
         } finally {
             summaryButton.disabled = false;
         }
     });
 };
+
 
 const showOverlay = (x, y) => {
     if (!overlay) createSummaryOverlay();
