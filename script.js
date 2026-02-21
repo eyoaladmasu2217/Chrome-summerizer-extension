@@ -15,14 +15,16 @@ const getSelectionSummary = async (text) => {
         messages: [
             {
                 role: 'system',
-                content: `Provide a very concise ${length} summary of the selected text in ${language}. Use bullet points.`
+                content: `You are a helpful reading assistant. Briefly summarize this selected text snippet in ${language}. 
+                Aim for 2-3 bullet points. Use a helpful, informative tone.`
             },
             {
                 role: 'user',
-                content: text
+                content: `Selected text: "${text}"`
             }
         ]
     };
+
 
     const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
         method: 'POST',

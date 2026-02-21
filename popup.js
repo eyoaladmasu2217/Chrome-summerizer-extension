@@ -206,20 +206,32 @@ const getSummary = async (text, links = []) => {
     const length = settings.summaryLength || 'medium';
     const language = settings.outputLanguage || 'en';
 
-    let linksContext = links.length > 0 ? `\n\nLinks found:\n${links.slice(0, 10).map(l => `- [${l.text}](${l.href})`).join('\n')}` : '';
+    let lengthInstruction = '';
+    switch (length) {
+        case 'short': lengthInstruction = 'Provide a very concise summary (3-5 sentences).'; break;
+        case 'long': lengthInstruction = 'Provide a detailed, in-depth summary with multiple sections.'; break;
+        default: lengthInstruction = 'Provide a well-balanced summary of the main points.';
+    }
 
     const payload = {
         model,
         messages: [
             {
                 role: 'system',
-                content: `You are a professional summarizer. Provide a ${length} summary in ${language}. Use markdown for structure. Highlight 5 key takeaways at the top.`
+                content: `You are an expert content analyst. Your task is to summarize the provided text in ${language}. 
+                Follow this structure:
+                1. **💡 Key Takeaways**: List 3-5 most important points as bullet points with emojis.
+                2. **📝 Summary**: ${lengthInstruction} Use professional and engaging tone.
+                3. **🔗 References**: If links are provided, mention the most relevant ones naturally.
+                
+                Use Markdown for formatting. Avoid fluff.`
             },
             {
                 role: 'user',
-                content: `Summarize the following text:\n\n${text}${linksContext}`
+                content: `Please analyze and summarize the following content:\n\n${text}${links.length > 0 ? '\n\nSource links:\n' + links.slice(0, 5).map(l => `- ${l.text}: ${l.href}`).join('\n') : ''}`
             }
-        ]
+        ],
+        temperature: 0.7
     };
 
     const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
@@ -231,10 +243,14 @@ const getSummary = async (text, links = []) => {
         body: JSON.stringify(payload)
     });
 
-    if (!response.ok) throw new Error('AI API request failed');
+    if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error?.message || 'AI API request failed');
+    }
     const data = await response.json();
     return data.choices[0].message.content;
 };
+
 
 const loadHistory = () => {
     chrome.storage.local.get(['summaries'], (result) => {
