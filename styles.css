@@ -61,22 +61,6 @@ body {
     gap: 10px;
 }
 
-.logo-icon {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-}
-
-.logo-icon i {
-    color: white;
-    font-size: 20px;
-}
-
 h1 {
     font-size: 20px;
     font-weight: 700;
