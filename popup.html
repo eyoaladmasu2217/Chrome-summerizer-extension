@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
+
 <body>
     <div class="extension-popup">
         <header class="header">
@@ -24,11 +26,13 @@
         </header>
 
         <nav class="tabs" role="tablist">
-            <button id="summarize-tab" class="tab-button active" role="tab" aria-selected="true" aria-controls="summarize-section">
+            <button id="summarize-tab" class="tab-button active" role="tab" aria-selected="true"
+                aria-controls="summarize-section">
                 <i class="material-icons-round">description</i>
                 Summarize
             </button>
-            <button id="history-tab" class="tab-button" role="tab" aria-selected="false" aria-controls="history-section">
+            <button id="history-tab" class="tab-button" role="tab" aria-selected="false"
+                aria-controls="history-section">
                 <i class="material-icons-round">history</i>
                 History
             </button>
@@ -36,9 +40,17 @@
 
         <main id="summarize-section" class="tab-content active" role="tabpanel" aria-labelledby="summarize-tab">
             <div id="reading-time" style="display:none;"></div>
-            
+
             <div class="summary-field">
-                <textarea id="summary" readonly placeholder="The AI summary will appear here once you click the button below..." aria-label="Summary output"></textarea>
+                <textarea id="summary" readonly
+                    placeholder="The AI summary will appear here once you click the button below..."
+                    aria-label="Summary output"></textarea>
+                <div id="skeleton-loader" class="skeleton-container" style="display: none;">
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                </div>
             </div>
 
             <div id="links-section" class="links-section" style="display:none;">
@@ -51,7 +63,7 @@
                     <i class="material-icons-round">auto_awesome</i>
                     Generate Summary
                 </button>
-                
+
                 <div class="export-grid">
                     <button id="copy-btn" class="buttons" aria-label="Copy to clipboard">
                         <i class="material-icons-round">content_copy</i>
@@ -73,10 +85,12 @@
             </div>
         </main>
 
-        <section id="history-section" class="tab-content" style="display:none;" role="tabpanel" aria-labelledby="history-tab">
+        <section id="history-section" class="tab-content" style="display:none;" role="tabpanel"
+            aria-labelledby="history-tab">
             <div id="history-list" aria-label="Summary history"></div>
         </section>
     </div>
     <script src="popup.js"></script>
 </body>
+
 </html>

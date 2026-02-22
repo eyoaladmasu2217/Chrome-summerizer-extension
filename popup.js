@@ -128,9 +128,12 @@ const handleSummarize = async () => {
     const readingTime = document.getElementById('reading-time');
     const linksList = document.getElementById('links-list');
     const linksSection = document.getElementById('links-section');
+    const skeleton = document.getElementById('skeleton-loader');
 
     summarizeBtn.innerText = 'Summarizing...';
     summarizeBtn.disabled = true;
+    textarea.style.display = 'none';
+    skeleton.style.display = 'flex';
 
     try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -203,8 +206,10 @@ const handleSummarize = async () => {
         console.error('Summary error:', error);
         alert(error.message || 'An error occurred during summarization.');
     } finally {
-        summarizeBtn.innerText = 'Summarize';
+        summarizeBtn.innerText = 'Generate Summary';
         summarizeBtn.disabled = false;
+        textarea.style.display = 'block';
+        document.getElementById('skeleton-loader').style.display = 'none';
     }
 };
 
