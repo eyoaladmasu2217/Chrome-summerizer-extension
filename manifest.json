@@ -1,21 +1,30 @@
 {
   "manifest_version": 3,
-  "name": "Summarize",
-  "version": "1.0",
-  "description": "Write a summary of the current active tab.",
+  "name": "Summarize AI - Advanced Web Content Recapper",
+  "version": "1.1.0",
+  "description": "High-performance AI summarization tool for web pages and text selections. Secure, private, and customizable.",
   "permissions": [
     "activeTab",
     "scripting",
     "storage"
   ],
   "host_permissions": [
-    "*://*.aimlapi.com/*"
+    "https://api.aimlapi.com/*"
   ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["script.js"],
-      "css": ["styles.css"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "script.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
     }
   ],
   "action": {
@@ -23,8 +32,7 @@
     "default_icon": {
       "128": "icon128.png"
     }
-  }
-  ,
+  },
   "options_ui": {
     "page": "options.html",
     "open_in_tab": false
