@@ -1,14 +1,17 @@
-const AIML_API_KEY = '99bd4f0072414eabb3f62da667581f7b';
+// AIML_API_KEY removed for security. Now retrieved from storage.
 const DEFAULT_MODEL = 'Summerizer';
 
 let overlay = null;
 let currentSelectedText = '';
 
 const getSelectionSummary = async (text) => {
-    const settings = await chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel']);
+    const settings = await chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel', 'apiKey']);
     const model = settings.aiModel || DEFAULT_MODEL;
     const length = settings.summaryLength || 'short';
     const language = settings.outputLanguage || 'en';
+    const apiKey = settings.apiKey;
+
+    if (!apiKey) throw new Error('API Key missing. Please set it in options.');
 
     const payload = {
         model,
@@ -29,7 +32,7 @@ const getSelectionSummary = async (text) => {
     const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${AIML_API_KEY}`,
+            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
@@ -114,14 +117,28 @@ const hideOverlay = () => {
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'GET_PAGE_DATA') {
-        const text = document.body.innerText || '';
+        const text = extractCleanText();
         const links = Array.from(document.querySelectorAll('a[href]'))
-            .map(a => ({ text: a.textContent.trim(), href: a.href }))
-            .filter(l => l.text && l.href.startsWith('http'));
-        sendResponse({ text: text.trim(), links });
+            .map(a => ({
+                text: a.textContent.trim(),
+                href: a.href,
+                hostname: new URL(a.href).hostname
+            }))
+            .filter(l => l.text.length > 5 && l.href.startsWith('http'))
+            .slice(0, 15);
+        sendResponse({ text, links, title: document.title });
     }
     return true;
 });
+
+const extractCleanText = () => {
+    const clone = document.body.cloneNode(true);
+    const selectorsToRemove = ['script', 'style', 'nav', 'footer', 'header', 'iframe', 'noscript', 'aside', '.ads', '#ads'];
+    selectorsToRemove.forEach(sel => {
+        clone.querySelectorAll(sel).forEach(el => el.remove());
+    });
+    return (clone.innerText || clone.textContent || '').trim().replace(/\s+/g, ' ');
+};
 
 document.addEventListener('mouseup', (e) => {
     if (overlay && overlay.contains(e.target)) return;
