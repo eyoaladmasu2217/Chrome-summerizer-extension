@@ -8,18 +8,26 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            width: 500px;
-            padding: 40px;
-            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
             background: var(--bg-dark);
+            background-image: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 400px),
+                radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.1), transparent 400px);
         }
 
         .settings-card {
+            width: 100%;
+            max-width: 550px;
             background: var(--card-bg);
-            border-radius: 20px;
+            border-radius: 24px;
             border: 1px solid var(--glass-border);
-            padding: 30px;
-            backdrop-filter: blur(10px);
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         .setting-group {
