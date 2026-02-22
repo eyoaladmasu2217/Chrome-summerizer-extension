@@ -173,13 +173,24 @@ const handleSummarize = async () => {
                 a.className = 'link-card';
                 a.href = link.href;
                 a.target = '_blank';
-                a.innerHTML = `
-                    <span class="link-title">${link.text || 'Untitled Link'}</span>
-                    <span class="link-host">
-                        <i class="material-icons-round" style="font-size: 12px;">link</i>
-                        ${link.hostname || 'link'}
-                    </span>
-                `;
+
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'link-title';
+                titleSpan.textContent = link.text || 'Untitled Link';
+
+                const hostSpan = document.createElement('span');
+                hostSpan.className = 'link-host';
+
+                const icon = document.createElement('i');
+                icon.className = 'material-icons-round';
+                icon.style.fontSize = '12px';
+                icon.textContent = 'link';
+
+                hostSpan.appendChild(icon);
+                hostSpan.appendChild(document.createTextNode(` ${link.hostname || 'link'}`));
+
+                a.appendChild(titleSpan);
+                a.appendChild(hostSpan);
                 linksList.appendChild(a);
             });
             linksSection.style.display = 'block';
@@ -302,17 +313,43 @@ const loadHistory = () => {
         summaries.forEach(item => {
             const div = document.createElement('div');
             div.className = 'history-item';
-            div.innerHTML = `
-                <div class="history-header">
-                    <h4>${item.title || 'Untitled'}</h4>
-                    <span class="history-date">${new Date(item.date).toLocaleDateString()}</span>
-                </div>
-                <p class="history-preview">${item.summary.substring(0, 80).replace(/<[^>]*>/g, '')}...</p>
-                <div class="history-actions">
-                    <button class="view-btn" data-id="${item.id}">View</button>
-                    <button class="delete-btn" data-id="${item.id}">Delete</button>
-                </div>
-            `;
+
+            const header = document.createElement('div');
+            header.className = 'history-header';
+
+            const title = document.createElement('h4');
+            title.textContent = item.title || 'Untitled';
+
+            const date = document.createElement('span');
+            date.className = 'history-date';
+            date.textContent = new Date(item.date).toLocaleDateString();
+
+            header.appendChild(title);
+            header.appendChild(date);
+
+            const preview = document.createElement('p');
+            preview.className = 'history-preview';
+            preview.textContent = (item.summary || '').substring(0, 80).replace(/<[^>]*>/g, '') + '...';
+
+            const actions = document.createElement('div');
+            actions.className = 'history-actions';
+
+            const viewBtn = document.createElement('button');
+            viewBtn.className = 'view-btn';
+            viewBtn.dataset.id = item.id;
+            viewBtn.textContent = 'View';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.dataset.id = item.id;
+            deleteBtn.textContent = 'Delete';
+
+            actions.appendChild(viewBtn);
+            actions.appendChild(deleteBtn);
+
+            div.appendChild(header);
+            div.appendChild(preview);
+            div.appendChild(actions);
             historyList.appendChild(div);
         });
 
