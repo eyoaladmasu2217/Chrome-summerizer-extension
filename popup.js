@@ -12,6 +12,22 @@ window.addEventListener('DOMContentLoaded', () => {
     loadHistory();
 });
 
+const showToast = (message, type = 'success') => {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const icon = type === 'success' ? 'check_circle' : 'error';
+    toast.innerHTML = `<i class="material-icons-round">${icon}</i><span>${message}</span>`;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+};
+
 const initSettings = () => {
     chrome.storage.sync.get(['darkMode'], (result) => {
         const darkMode = result.darkMode || false;
@@ -65,6 +81,7 @@ const initEventListeners = () => {
         const text = textarea.value;
         if (!text) return;
         navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied to clipboard!');
             const originalText = copyBtn.innerHTML;
             copyBtn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 8px;">check</i>Copied!';
             setTimeout(() => copyBtn.innerHTML = originalText, 2000);
@@ -204,7 +221,7 @@ const handleSummarize = async () => {
 
     } catch (error) {
         console.error('Summary error:', error);
-        alert(error.message || 'An error occurred during summarization.');
+        showToast(error.message || 'An error occurred during summarization.', 'error');
     } finally {
         summarizeBtn.innerText = 'Generate Summary';
         summarizeBtn.disabled = false;
