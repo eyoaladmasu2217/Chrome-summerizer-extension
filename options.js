@@ -4,10 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('save-btn');
 
     // Load saved settings
-    chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel', 'darkMode'], (result) => {
+    chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel', 'darkMode', 'apiKey'], (result) => {
         document.getElementById('summary-length').value = result.summaryLength || 'medium';
         document.getElementById('output-language').value = result.outputLanguage || 'en';
         document.getElementById('ai-model').value = result.aiModel || 'Summerizer';
+        document.getElementById('api-key').value = result.apiKey || '';
         document.getElementById('dark-mode').checked = result.darkMode !== false; // Default to true
 
         // Apply dark mode immediately
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             summaryLength: document.getElementById('summary-length').value,
             outputLanguage: document.getElementById('output-language').value,
             aiModel: document.getElementById('ai-model').value,
+            apiKey: document.getElementById('api-key').value,
             darkMode: document.getElementById('dark-mode').checked
         };
 

@@ -1,4 +1,4 @@
-const AIML_API_KEY = '99bd4f0072414eabb3f62da667581f7b';
+// AIML_API_KEY removed for security. Now retrieved from storage.
 const DEFAULT_MODEL = 'Summerizer';
 
 // State management
@@ -236,10 +236,15 @@ const getPageData = (tabId) => {
 
 
 const getSummary = async (text, links = []) => {
-    const settings = await chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel']);
+    const settings = await chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel', 'apiKey']);
     const model = settings.aiModel || DEFAULT_MODEL;
     const length = settings.summaryLength || 'medium';
     const language = settings.outputLanguage || 'en';
+    const apiKey = settings.apiKey;
+
+    if (!apiKey) {
+        throw new Error('Please set your API Key in the settings page.');
+    }
 
     let lengthInstruction = '';
     switch (length) {
@@ -272,7 +277,7 @@ const getSummary = async (text, links = []) => {
     const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${AIML_API_KEY}`,
+            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
