@@ -132,11 +132,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 const extractCleanText = () => {
-    const clone = document.body.cloneNode(true);
-    const selectorsToRemove = ['script', 'style', 'nav', 'footer', 'header', 'iframe', 'noscript', 'aside', '.ads', '#ads'];
+    // Try to find main content areas
+    const mainContentSelectors = ['article', '[role="main"]', 'main', '.content', '.article', '.post-content', '#content', '.entry-content'];
+    let contentElement = null;
+
+    for (const sel of mainContentSelectors) {
+        const el = document.querySelector(sel);
+        if (el && el.innerText.length > 400) {
+            contentElement = el;
+            break;
+        }
+    }
+
+    const target = contentElement || document.body;
+    const clone = target.cloneNode(true);
+
+    const selectorsToRemove = [
+        'script', 'style', 'nav', 'footer', 'header', 'iframe', 'noscript', 'aside',
+        '.ads', '#ads', '.comments', '.sidebar', '.menu', '.nav', '.social-share',
+        '.cookie-banner', '#cookie-banner', '.newsletter', '.popup-overlay'
+    ];
     selectorsToRemove.forEach(sel => {
         clone.querySelectorAll(sel).forEach(el => el.remove());
     });
+
     return (clone.innerText || clone.textContent || '').trim().replace(/\s+/g, ' ');
 };
 
