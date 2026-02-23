@@ -173,6 +173,68 @@ h1 {
     }
 }
 
+/* Status Steps */
+.status-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 10px 0;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--glass-highlight);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    opacity: 0.5;
+}
+
+.step i {
+    font-size: 18px;
+}
+
+.step.active {
+    opacity: 1;
+    color: var(--text-main);
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid var(--glass-border);
+}
+
+.step.completed {
+    opacity: 1;
+    color: var(--success);
+}
+
+.step.completed i {
+    animation: bounceIn 0.5s ease;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    70% {
+        transform: scale(0.9);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 /* Output Area */
 .summary-field {
     background: var(--card-bg);
@@ -404,6 +466,17 @@ textarea#summary::placeholder {
     color: white;
 }
 
+.copy-history-btn {
+    background: var(--glass-highlight);
+    color: var(--text-main);
+    border: 1px solid var(--glass-border) !important;
+}
+
+.copy-history-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
 .delete-btn {
     background: rgba(239, 68, 68, 0.1);
     color: var(--error);
@@ -412,6 +485,36 @@ textarea#summary::placeholder {
 .delete-btn:hover {
     background: var(--error);
     color: white;
+}
+
+.history-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+.text-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.text-btn:hover {
+    color: var(--error);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.text-btn i {
+    font-size: 16px;
 }
 
 /* Output Area */
