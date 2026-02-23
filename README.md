@@ -25,18 +25,32 @@ Automatically crawls the active DOM to extract and categorize unique web links.
 - **Card-based UI**: Displays links with their respective hostnames and metadata.
 - **Top 20 Extraction**: Prioritizes key navigational and reference content.
 
-### 📜 Knowledge Management
+### 🌗 Smart Theme Toggle
+Seamlessly switch between Dark and Light modes via a dedicated header toggle. Your preference is persisted across sessions for a consistent reading experience.
+
+### ⏱️ Real-time Progress Tracking
+A brand new multi-step status indicator provides transparency during the summarization process, tracking page reading, AI analysis, and formatting steps.
+
+### 🧹 Advanced History & Management
 - **Persistence**: Remembers up to 50 previous summaries via `chrome.storage.local`.
 - **Searchable History**: Review title, date, and content of past sessions.
+- **Bulk Cleanup**: New "Clear All" option to securely wipe your history with one click.
+- **Quick Actions**: Individual "Copy" and "Delete" buttons for every history entry.
+
+### 📄 Premium PDF Reports
+Generated reports now include:
+- **Source Attribution**: Clickable links back to the original article.
+- **Metadata**: Date, time, and page title.
+- **Pagination**: Professional multi-page support with automatic footer numbering.
 
 ---
 
 ## 🎨 Premium Experience
 
 - **Glassmorphism Design**: Modern UI utilizing background blurs, subtle borders, and harmonious gradients.
-- **Micro-Animations**: Smooth transitions, shimmer loading states, and haptic-inspired visual feedback.
-- **Adaptive Appearance**: Intelligent Dark/Light mode switching that preserves eye comfort.
-- **Responsive Layout**: Optimized for varying browser window sizes and side panels.
+- **Micro-Animations**: Smooth transitions, shimmer loading states, and bounce-in success indicators.
+- **Adaptive Layout**: Optimized for varying browser window sizes and side panels.
+- **Intelligent Feedback**: Real-time status steps and haptic-inspired visual cues.
 
 ---
 
