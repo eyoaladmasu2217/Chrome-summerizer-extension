@@ -16,6 +16,9 @@
                 <h1>Summarize AI</h1>
             </div>
             <div class="header-actions">
+                <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
+                    <i class="material-icons-round">light_mode</i>
+                </button>
                 <button id="settings-trigger" class="icon-btn" title="Settings">
                     <i class="material-icons-round">settings</i>
                 </button>
@@ -42,6 +45,20 @@
                 <textarea id="summary" readonly
                     placeholder="The AI summary will appear here once you click the button below..."
                     aria-label="Summary output"></textarea>
+                <div id="status-steps" class="status-steps" style="display: none;">
+                    <div class="step" data-step="1">
+                        <i class="material-icons-round">description</i>
+                        <span>Reading page content...</span>
+                    </div>
+                    <div class="step" data-step="2">
+                        <i class="material-icons-round">psychology</i>
+                        <span>Analyzing with AI...</span>
+                    </div>
+                    <div class="step" data-step="3">
+                        <i class="material-icons-round">spellcheck</i>
+                        <span>Formatting results...</span>
+                    </div>
+                </div>
                 <div id="skeleton-loader" class="skeleton-container" style="display: none;">
                     <div class="skeleton-line"></div>
                     <div class="skeleton-line"></div>
@@ -84,6 +101,12 @@
 
         <section id="history-section" class="tab-content" style="display:none;" role="tabpanel"
             aria-labelledby="history-tab">
+            <div class="history-controls">
+                <button id="clear-history-btn" class="text-btn">
+                    <i class="material-icons-round">delete_sweep</i>
+                    Clear All History
+                </button>
+            </div>
             <div id="history-list" aria-label="Summary history"></div>
         </section>
     </div>
