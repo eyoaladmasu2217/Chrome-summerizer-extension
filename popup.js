@@ -29,10 +29,28 @@ const showToast = (message, type = 'success') => {
 };
 
 const initSettings = () => {
+    const themeToggle = document.getElementById('theme-toggle');
     chrome.storage.sync.get(['darkMode'], (result) => {
-        const darkMode = result.darkMode || false;
+        const darkMode = result.darkMode !== false; // Default to dark mode
         document.body.classList.toggle('light-mode', !darkMode);
+        updateThemeIcon(darkMode);
     });
+
+    themeToggle.addEventListener('click', () => {
+        const isCurrentlyLight = document.body.classList.contains('light-mode');
+        const newDarkMode = isCurrentlyLight; // If light, change to dark (true)
+        document.body.classList.toggle('light-mode');
+        chrome.storage.sync.set({ darkMode: newDarkMode });
+        updateThemeIcon(newDarkMode);
+        showToast(`${newDarkMode ? 'Dark' : 'Light'} mode enabled`);
+    });
+};
+
+const updateThemeIcon = (isDark) => {
+    const icon = document.querySelector('#theme-toggle i');
+    if (icon) {
+        icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    }
 };
 
 const initTabs = () => {
@@ -66,8 +84,18 @@ const initEventListeners = () => {
     const shareBtn = document.getElementById('share-btn');
     const settingsTrigger = document.getElementById('settings-trigger');
     const textarea = document.getElementById('summary');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
 
     summarizeBtn.addEventListener('click', handleSummarize);
+
+    clearHistoryBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all summarization history?')) {
+            chrome.storage.local.set({ summaries: [] }, () => {
+                loadHistory();
+                showToast('History cleared');
+            });
+        }
+    });
 
     settingsTrigger.addEventListener('click', () => {
         if (chrome.runtime.openOptionsPage) {
@@ -99,28 +127,52 @@ const initEventListeners = () => {
         URL.revokeObjectURL(url);
     });
 
-    pdfBtn.addEventListener('click', () => {
+    pdfBtn.addEventListener('click', async () => {
         const text = textarea.value;
         if (!text) return;
+
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const sourceUrl = tab?.url || 'N/A';
+        const sourceTitle = tab?.title || 'Web Content';
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
+        // Header
         doc.setFillColor(99, 102, 241);
         doc.rect(0, 0, 210, 40, 'F');
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(22);
         doc.text('Summarize AI Analytics', 20, 28);
 
+        // Metadata
         doc.setTextColor(148, 163, 184);
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 50);
 
+        doc.setTextColor(99, 102, 241);
+        doc.text(`Source: ${sourceTitle}`, 20, 55);
+        doc.setFontSize(8);
+        doc.setTextColor(148, 163, 184);
+        doc.textWithLink(sourceUrl.substring(0, 100) + (sourceUrl.length > 100 ? '...' : ''), 20, 60, { url: sourceUrl });
+
+        // Content
         doc.setTextColor(30, 41, 59);
-        doc.setFontSize(12);
+        doc.setFontSize(11);
         const lines = doc.splitTextToSize(text, 170);
-        doc.text(lines, 20, 65);
+        doc.text(lines, 20, 75);
+
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(148, 163, 184);
+            doc.text(`Page ${i} of ${pageCount} | Summarize AI Extension`, 20, 285);
+        }
 
         doc.save(`summary-${Date.now()}.pdf`);
+        showToast('PDF Report generated');
     });
 
     shareBtn.addEventListener('click', () => {
@@ -139,6 +191,17 @@ const initEventListeners = () => {
 };
 
 
+const updateStepStatus = (stepNumber, status) => {
+    const steps = document.querySelectorAll('.step');
+    steps.forEach(step => {
+        if (parseInt(step.dataset.step) === stepNumber) {
+            step.classList.remove('active', 'completed');
+            if (status === 'active') step.classList.add('active');
+            if (status === 'completed') step.classList.add('completed');
+        }
+    });
+};
+
 const handleSummarize = async () => {
     const summarizeBtn = document.getElementById('summarize-btn');
     const textarea = document.getElementById('summary');
@@ -146,19 +209,25 @@ const handleSummarize = async () => {
     const linksList = document.getElementById('links-list');
     const linksSection = document.getElementById('links-section');
     const skeleton = document.getElementById('skeleton-loader');
+    const statusSteps = document.getElementById('status-steps');
 
     summarizeBtn.innerText = 'Summarizing...';
     summarizeBtn.disabled = true;
     textarea.style.display = 'none';
-    skeleton.style.display = 'flex';
+    statusSteps.style.display = 'flex';
+
+    // Reset steps
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'completed'));
 
     try {
+        updateStepStatus(1, 'active');
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         const pageData = await getPageData(tab.id);
 
         if (!pageData || !pageData.text || pageData.text.length < 50) {
             throw new Error('Not enough text found on this page.');
         }
+        updateStepStatus(1, 'completed');
 
         // Calculate reading time
         const wordCount = pageData.text.trim().split(/\s+/).length;
@@ -166,9 +235,18 @@ const handleSummarize = async () => {
         readingTime.textContent = `Estimated reading time: ${minutes} min${minutes !== 1 ? 's' : ''}`;
         readingTime.style.display = 'block';
 
+        updateStepStatus(2, 'active');
         const summary = await getSummary(pageData.text, pageData.links);
+        updateStepStatus(2, 'completed');
+
+        updateStepStatus(3, 'active');
         textarea.value = summary.replace(/<[^>]*>/g, ''); // Simple strip for textarea
         currentSummary = summary;
+
+        // Brief delay for visual feedback
+        await new Promise(r => setTimeout(r, 600));
+        updateStepStatus(3, 'completed');
+        await new Promise(r => setTimeout(r, 400));
 
         // Save to local storage
         const historyItem = {
@@ -226,7 +304,8 @@ const handleSummarize = async () => {
         summarizeBtn.innerText = 'Generate Summary';
         summarizeBtn.disabled = false;
         textarea.style.display = 'block';
-        document.getElementById('skeleton-loader').style.display = 'none';
+        statusSteps.style.display = 'none';
+        skeleton.style.display = 'none';
     }
 };
 
@@ -366,7 +445,14 @@ const loadHistory = () => {
             deleteBtn.dataset.id = item.id;
             deleteBtn.textContent = 'Delete';
 
+            const copyHistoryBtn = document.createElement('button');
+            copyHistoryBtn.className = 'copy-history-btn';
+            copyHistoryBtn.dataset.id = item.id;
+            copyHistoryBtn.innerHTML = '<i class="material-icons-round" style="font-size: 14px;">content_copy</i>';
+            copyHistoryBtn.title = 'Copy Summary';
+
             actions.appendChild(viewBtn);
+            actions.appendChild(copyHistoryBtn);
             actions.appendChild(deleteBtn);
 
             div.appendChild(header);
@@ -386,6 +472,13 @@ const loadHistory = () => {
                 if (item) {
                     document.getElementById('summary').value = item.summary.replace(/<[^>]*>/g, '');
                     document.getElementById('summarize-tab').click();
+                }
+            } else if (btn.classList.contains('copy-history-btn')) {
+                const item = summaries.find(s => s.id === id);
+                if (item) {
+                    navigator.clipboard.writeText(item.summary.replace(/<[^>]*>/g, '')).then(() => {
+                        showToast('Copied history summary!');
+                    });
                 }
             } else if (btn.classList.contains('delete-btn')) {
                 const updated = summaries.filter(s => s.id !== id);
