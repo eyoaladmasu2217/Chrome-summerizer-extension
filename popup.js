@@ -84,9 +84,13 @@ const initEventListeners = () => {
     const shareBtn = document.getElementById('share-btn');
     const settingsTrigger = document.getElementById('settings-trigger');
     const textarea = document.getElementById('summary');
-    const clearHistoryBtn = document.getElementById('clear-history-btn');
+    const historySearch = document.getElementById('history-search');
 
     summarizeBtn.addEventListener('click', handleSummarize);
+
+    historySearch.addEventListener('input', (e) => {
+        loadHistory(e.target.value);
+    });
 
     clearHistoryBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all summarization history?')) {
@@ -404,12 +408,21 @@ const getSummary = async (text, links = []) => {
 };
 
 
-const loadHistory = () => {
+const loadHistory = (searchQuery = '') => {
     chrome.storage.local.get(['summaries'], (result) => {
         const historyList = document.getElementById('history-list');
-        const summaries = result.summaries || [];
+        let summaries = result.summaries || [];
 
-        historyList.innerHTML = summaries.length === 0 ? '<p class="empty-msg">No history yet.</p>' : '';
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            summaries = summaries.filter(item =>
+                (item.title || '').toLowerCase().includes(query) ||
+                (item.summary || '').toLowerCase().includes(query)
+            );
+        }
+
+        historyList.innerHTML = summaries.length === 0 ?
+            `<p class="empty-msg">${searchQuery ? 'No matches found.' : 'No history yet.'}</p>` : '';
 
         summaries.forEach(item => {
             const div = document.createElement('div');
