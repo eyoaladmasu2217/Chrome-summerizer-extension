@@ -4,13 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('save-btn');
 
     // Load saved settings
-    chrome.storage.sync.get(['summaryLength', 'summaryTone', 'outputLanguage', 'aiModel', 'darkMode', 'apiKey'], (result) => {
+    chrome.storage.sync.get(['summaryLength', 'summaryTone', 'outputLanguage', 'aiModel', 'darkMode', 'autoCopy', 'apiKey'], (result) => {
         document.getElementById('summary-length').value = result.summaryLength || 'medium';
         document.getElementById('summary-tone').value = result.summaryTone || 'professional';
         document.getElementById('output-language').value = result.outputLanguage || 'en';
         document.getElementById('ai-model').value = result.aiModel || 'Summerizer';
         document.getElementById('api-key').value = result.apiKey || '';
         document.getElementById('dark-mode').checked = result.darkMode !== false; // Default to true
+        document.getElementById('auto-copy').checked = result.autoCopy || false;
 
         // Apply dark mode immediately
         document.body.classList.toggle('light-mode', result.darkMode === false);
@@ -27,7 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
             outputLanguage: document.getElementById('output-language').value,
             aiModel: document.getElementById('ai-model').value,
             apiKey: document.getElementById('api-key').value,
-            darkMode: document.getElementById('dark-mode').checked
+            darkMode: document.getElementById('dark-mode').checked,
+            autoCopy: document.getElementById('auto-copy').checked
         };
 
         chrome.storage.sync.set(settings, () => {
