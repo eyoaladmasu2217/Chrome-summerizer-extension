@@ -4,8 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('save-btn');
 
     // Load saved settings
-    chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel', 'darkMode', 'apiKey'], (result) => {
+    chrome.storage.sync.get(['summaryLength', 'summaryTone', 'outputLanguage', 'aiModel', 'darkMode', 'apiKey'], (result) => {
         document.getElementById('summary-length').value = result.summaryLength || 'medium';
+        document.getElementById('summary-tone').value = result.summaryTone || 'professional';
         document.getElementById('output-language').value = result.outputLanguage || 'en';
         document.getElementById('ai-model').value = result.aiModel || 'Summerizer';
         document.getElementById('api-key').value = result.apiKey || '';
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const settings = {
             summaryLength: document.getElementById('summary-length').value,
+            summaryTone: document.getElementById('summary-tone').value,
             outputLanguage: document.getElementById('output-language').value,
             aiModel: document.getElementById('ai-model').value,
             apiKey: document.getElementById('api-key').value,
