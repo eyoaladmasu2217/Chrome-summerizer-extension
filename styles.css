@@ -128,6 +128,46 @@ h1 {
 }
 
 /* Status & Indicators */
+/* Stats Bar */
+.stats-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--glass-highlight);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.stat span {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.stat label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--glass-border);
+}
+
 #reading-time {
     font-size: 13px;
     color: var(--primary);
