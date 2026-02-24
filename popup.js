@@ -374,9 +374,10 @@ const getPageData = (tabId) => {
 
 
 const getSummary = async (text, links = []) => {
-    const settings = await chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel', 'apiKey']);
+    const settings = await chrome.storage.sync.get(['summaryLength', 'summaryTone', 'outputLanguage', 'aiModel', 'apiKey']);
     const model = settings.aiModel || DEFAULT_MODEL;
     const length = settings.summaryLength || 'medium';
+    const tone = settings.summaryTone || 'professional';
     const language = settings.outputLanguage || 'en';
     const apiKey = settings.apiKey;
 
@@ -391,6 +392,14 @@ const getSummary = async (text, links = []) => {
         default: lengthInstruction = 'Provide a well-balanced summary of the main points.';
     }
 
+    let toneInstruction = '';
+    switch (tone) {
+        case 'casual': toneInstruction = 'Use a casual, friendly, and conversational tone.'; break;
+        case 'creative': toneInstruction = 'Use a creative, engaging, and enthusiastic tone.'; break;
+        case 'minimalist': toneInstruction = 'Be extremely brief and use ultra-minimalist language.'; break;
+        default: toneInstruction = 'Use a professional, academic, and informative tone.';
+    }
+
     const payload = {
         model,
         messages: [
@@ -399,7 +408,7 @@ const getSummary = async (text, links = []) => {
                 content: `You are an expert content analyst. Your task is to summarize the provided text in ${language}. 
                 Follow this structure:
                 1. **💡 Key Takeaways**: List 3-5 most important points as bullet points with emojis.
-                2. **📝 Summary**: ${lengthInstruction} Use professional and engaging tone.
+                2. **📝 Summary**: ${lengthInstruction} ${toneInstruction}
                 3. **🔗 References**: If links are provided, mention the most relevant ones naturally.
                 
                 Use Markdown for formatting. Avoid fluff.`
