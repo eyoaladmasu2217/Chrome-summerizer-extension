@@ -274,6 +274,15 @@ const handleSummarize = async () => {
         updateStepStatus(3, 'completed');
         await new Promise(r => setTimeout(r, 400));
 
+        // Auto-copy if enabled
+        chrome.storage.sync.get(['autoCopy'], (result) => {
+            if (result.autoCopy) {
+                navigator.clipboard.writeText(summary.replace(/<[^>]*>/g, '')).then(() => {
+                    showToast('Copied to clipboard automatically!');
+                });
+            }
+        });
+
         // Save to local storage
         const historyItem = {
             id: Date.now(),
