@@ -10,7 +10,28 @@ window.addEventListener('DOMContentLoaded', () => {
     initTabs();
     initEventListeners();
     loadHistory();
+    loadStats();
 });
+
+const loadStats = () => {
+    chrome.storage.local.get(['stats'], (result) => {
+        const stats = result.stats || { count: 0, timeSaved: 0 };
+        document.getElementById('stat-count').textContent = stats.count;
+        document.getElementById('stat-time').textContent = `${stats.timeSaved}m`;
+    });
+};
+
+const updateStats = (minutesSaved) => {
+    chrome.storage.local.get(['stats'], (result) => {
+        const stats = result.stats || { count: 0, timeSaved: 0 };
+        stats.count += 1;
+        stats.timeSaved += minutesSaved;
+        chrome.storage.local.set({ stats }, () => {
+            document.getElementById('stat-count').textContent = stats.count;
+            document.getElementById('stat-time').textContent = `${stats.timeSaved}m`;
+        });
+    });
+};
 
 const showToast = (message, type = 'success') => {
     const container = document.getElementById('toast-container');
@@ -242,6 +263,7 @@ const handleSummarize = async () => {
         updateStepStatus(2, 'active');
         const summary = await getSummary(pageData.text, pageData.links);
         updateStepStatus(2, 'completed');
+        updateStats(minutes);
 
         updateStepStatus(3, 'active');
         textarea.value = summary.replace(/<[^>]*>/g, ''); // Simple strip for textarea
