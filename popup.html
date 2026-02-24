@@ -102,9 +102,13 @@
         <section id="history-section" class="tab-content" style="display:none;" role="tabpanel"
             aria-labelledby="history-tab">
             <div class="history-controls">
+                <div class="search-box">
+                    <i class="material-icons-round">search</i>
+                    <input type="text" id="history-search" placeholder="Search history..." aria-label="Search history">
+                </div>
                 <button id="clear-history-btn" class="text-btn">
                     <i class="material-icons-round">delete_sweep</i>
-                    Clear All History
+                    Clear All
                 </button>
             </div>
             <div id="history-list" aria-label="Summary history"></div>

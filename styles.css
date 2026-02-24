@@ -489,8 +489,45 @@ textarea#summary::placeholder {
 
 .history-controls {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 12px;
+    gap: 12px;
+}
+
+.search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--glass-highlight);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 6px 12px;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.search-box:focus-within {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.search-box i {
+    font-size: 18px;
+    color: var(--text-muted);
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 13px;
+    width: 100%;
+    outline: none;
+}
+
+.search-box input::placeholder {
+    color: var(--text-muted);
 }
 
 .text-btn {
