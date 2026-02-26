@@ -829,3 +829,14 @@ textarea#summary::placeholder {
          t e x t - o v e r f l o w :   e l l i p s i s ; 
  }  
  
+ . c o p y - u r l - b t n   { 
+         b a c k g r o u n d :   v a r ( - - g l a s s - h i g h l i g h t ) ; 
+         c o l o r :   v a r ( - - t e x t - m a i n ) ; 
+         b o r d e r :   1 p x   s o l i d   v a r ( - - g l a s s - b o r d e r )   ! i m p o r t a n t ; 
+ } 
+ 
+ . c o p y - u r l - b t n : h o v e r   { 
+         b a c k g r o u n d :   v a r ( - - s e c o n d a r y ) ; 
+         c o l o r :   w h i t e ; 
+ }  
+ 

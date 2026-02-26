@@ -533,8 +533,15 @@ const loadHistory = (searchQuery = '') => {
             copyHistoryBtn.innerHTML = '<i class="material-icons-round" style="font-size: 14px;">content_copy</i>';
             copyHistoryBtn.title = 'Copy Summary';
 
+            const copyUrlBtn = document.createElement('button');
+            copyUrlBtn.className = 'copy-url-btn';
+            copyUrlBtn.dataset.id = item.id;
+            copyUrlBtn.innerHTML = '<i class="material-icons-round" style="font-size: 14px;">link</i>';
+            copyUrlBtn.title = 'Copy Source URL';
+
             actions.appendChild(viewBtn);
             actions.appendChild(copyHistoryBtn);
+            actions.appendChild(copyUrlBtn);
             actions.appendChild(deleteBtn);
 
             div.appendChild(header);
@@ -560,6 +567,13 @@ const loadHistory = (searchQuery = '') => {
                 if (item) {
                     navigator.clipboard.writeText(item.summary.replace(/<[^>]*>/g, '')).then(() => {
                         showToast('Copied history summary!');
+                    });
+                }
+            } else if (btn.classList.contains('copy-url-btn')) {
+                const item = summaries.find(s => s.id === id);
+                if (item) {
+                    navigator.clipboard.writeText(item.url).then(() => {
+                        showToast('Source URL copied!');
                     });
                 }
             } else if (btn.classList.contains('delete-btn')) {
