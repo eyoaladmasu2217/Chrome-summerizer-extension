@@ -51,10 +51,16 @@ const showToast = (message, type = 'success') => {
 
 const initSettings = () => {
     const themeToggle = document.getElementById('theme-toggle');
-    chrome.storage.sync.get(['darkMode'], (result) => {
+    const autocopyChip = document.getElementById('autocopy-chip');
+
+    chrome.storage.sync.get(['darkMode', 'autoCopy'], (result) => {
         const darkMode = result.darkMode !== false; // Default to dark mode
         document.body.classList.toggle('light-mode', !darkMode);
         updateThemeIcon(darkMode);
+
+        if (result.autoCopy && autocopyChip) {
+            autocopyChip.style.display = 'flex';
+        }
     });
 
     themeToggle.addEventListener('click', () => {
