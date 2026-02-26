@@ -309,6 +309,10 @@ const handleSummarize = async () => {
         document.getElementById('count-container').style.display = 'flex';
         document.getElementById('regenerate-btn').style.display = 'flex';
 
+        const now = new Date().toLocaleTimeString();
+        document.getElementById('last-updated-time').textContent = `Summarized at ${now}`;
+        document.getElementById('last-updated-container').style.display = 'flex';
+
         // Brief delay for visual feedback
         await new Promise(r => setTimeout(r, 600));
         updateStepStatus(3, 'completed');
