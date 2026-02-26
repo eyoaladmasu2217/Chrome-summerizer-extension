@@ -267,8 +267,16 @@ const handleSummarize = async () => {
         updateStats(minutes);
 
         updateStepStatus(3, 'active');
-        textarea.value = summary.replace(/<[^>]*>/g, ''); // Simple strip for textarea
+        const cleanText = summary.replace(/<[^>]*>/g, '');
+        textarea.value = cleanText;
         currentSummary = summary;
+
+        // Update counts
+        const charCount = cleanText.length;
+        const summaryWordCount = cleanText.trim().split(/\s+/).filter(w => w.length > 0).length;
+        document.getElementById('char-count').textContent = `${charCount} characters`;
+        document.getElementById('word-count').textContent = `${summaryWordCount} words`;
+        document.getElementById('count-container').style.display = 'flex';
 
         // Brief delay for visual feedback
         await new Promise(r => setTimeout(r, 600));
