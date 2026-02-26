@@ -333,6 +333,7 @@ const handleSummarize = async () => {
             url: tab.url,
             title: tab.title,
             summary: summary,
+            model: settings.aiModel || DEFAULT_MODEL,
             date: new Date().toISOString()
         };
 
@@ -526,8 +527,13 @@ const loadHistory = (searchQuery = '') => {
             const title = document.createElement('h4');
             title.textContent = item.title || 'Untitled';
 
+            const modelBadge = document.createElement('span');
+            modelBadge.className = 'model-badge';
+            modelBadge.textContent = item.model || DEFAULT_MODEL;
+
             sourceGroup.appendChild(favicon);
             sourceGroup.appendChild(title);
+            sourceGroup.appendChild(modelBadge);
 
             const date = document.createElement('span');
             date.className = 'history-date';
