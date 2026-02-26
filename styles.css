@@ -840,3 +840,11 @@ textarea#summary::placeholder {
          c o l o r :   w h i t e ; 
  }  
  
+ . i c o n - b t n . t i n y   { 
+         p a d d i n g :   4 p x ; 
+ } 
+ 
+ . i c o n - b t n . t i n y   i   { 
+         f o n t - s i z e :   1 6 p x ; 
+ }  
+ 

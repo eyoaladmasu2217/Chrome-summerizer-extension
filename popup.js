@@ -116,11 +116,22 @@ const initEventListeners = () => {
     const clearHistoryBtn = document.getElementById('clear-history-btn');
     const regenerateBtn = document.getElementById('regenerate-btn');
 
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+
     summarizeBtn.addEventListener('click', handleSummarize);
     regenerateBtn.addEventListener('click', handleSummarize);
 
     historySearch.addEventListener('input', (e) => {
-        loadHistory(e.target.value);
+        const query = e.target.value;
+        loadHistory(query);
+        clearSearchBtn.style.display = query ? 'flex' : 'none';
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+        historySearch.value = '';
+        loadHistory('');
+        clearSearchBtn.style.display = 'none';
+        historySearch.focus();
     });
 
     clearHistoryBtn.addEventListener('click', () => {
