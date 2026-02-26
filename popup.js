@@ -115,11 +115,22 @@ const initEventListeners = () => {
     const historySearch = document.getElementById('history-search');
     const clearHistoryBtn = document.getElementById('clear-history-btn');
     const regenerateBtn = document.getElementById('regenerate-btn');
-
     const clearSearchBtn = document.getElementById('clear-search-btn');
+    const copyAllLinksBtn = document.getElementById('copy-all-links');
 
     summarizeBtn.addEventListener('click', handleSummarize);
     regenerateBtn.addEventListener('click', handleSummarize);
+
+    copyAllLinksBtn.addEventListener('click', () => {
+        const links = Array.from(document.querySelectorAll('#links-list .link-card'))
+            .map(a => `${a.querySelector('.link-title').textContent}: ${a.href}`)
+            .join('\n');
+        if (links) {
+            navigator.clipboard.writeText(links).then(() => {
+                showToast('All links copied!');
+            });
+        }
+    });
 
     historySearch.addEventListener('input', (e) => {
         const query = e.target.value;

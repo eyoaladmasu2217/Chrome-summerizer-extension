@@ -848,3 +848,15 @@ textarea#summary::placeholder {
          f o n t - s i z e :   1 6 p x ; 
  }  
  
+ . s e c t i o n - h e a d e r   { 
+         d i s p l a y :   f l e x ; 
+         j u s t i f y - c o n t e n t :   s p a c e - b e t w e e n ; 
+         a l i g n - i t e m s :   c e n t e r ; 
+         m a r g i n - b o t t o m :   1 2 p x ; 
+ } 
+ 
+ . t e x t - b t n . t i n y   { 
+         p a d d i n g :   4 p x   8 p x ; 
+         f o n t - s i z e :   1 0 p x ; 
+ }  
+ 
