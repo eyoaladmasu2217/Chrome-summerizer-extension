@@ -108,8 +108,10 @@ const initEventListeners = () => {
     const textarea = document.getElementById('summary');
     const historySearch = document.getElementById('history-search');
     const clearHistoryBtn = document.getElementById('clear-history-btn');
+    const regenerateBtn = document.getElementById('regenerate-btn');
 
     summarizeBtn.addEventListener('click', handleSummarize);
+    regenerateBtn.addEventListener('click', handleSummarize);
 
     historySearch.addEventListener('input', (e) => {
         loadHistory(e.target.value);
@@ -277,6 +279,7 @@ const handleSummarize = async () => {
         document.getElementById('char-count').textContent = `${charCount} characters`;
         document.getElementById('word-count').textContent = `${summaryWordCount} words`;
         document.getElementById('count-container').style.display = 'flex';
+        document.getElementById('regenerate-btn').style.display = 'flex';
 
         // Brief delay for visual feedback
         await new Promise(r => setTimeout(r, 600));

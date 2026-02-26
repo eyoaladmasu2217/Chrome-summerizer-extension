@@ -89,10 +89,16 @@
             </div>
 
             <div class="main-actions">
-                <button id="summarize-btn" class="buttons" aria-label="Summarize current page">
-                    <i class="material-icons-round">auto_awesome</i>
-                    Generate Summary
-                </button>
+                <div class="main-button-group">
+                    <button id="summarize-btn" class="buttons" aria-label="Summarize current page">
+                        <i class="material-icons-round">auto_awesome</i>
+                        Generate Summary
+                    </button>
+                    <button id="regenerate-btn" class="buttons secondary-btn" style="display: none;"
+                        title="Regenerate Summary">
+                        <i class="material-icons-round">refresh</i>
+                    </button>
+                </div>
 
                 <div class="export-grid">
                     <button id="copy-btn" class="buttons" aria-label="Copy to clipboard">
