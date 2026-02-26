@@ -115,11 +115,25 @@ const initEventListeners = () => {
     const historySearch = document.getElementById('history-search');
     const clearHistoryBtn = document.getElementById('clear-history-btn');
     const regenerateBtn = document.getElementById('regenerate-btn');
+    const markdownBtn = document.getElementById('markdown-btn');
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const copyAllLinksBtn = document.getElementById('copy-all-links');
 
     summarizeBtn.addEventListener('click', handleSummarize);
     regenerateBtn.addEventListener('click', handleSummarize);
+
+    markdownBtn.addEventListener('click', () => {
+        const text = textarea.value;
+        if (!text) return;
+        const blob = new Blob([text], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `summary-${Date.now()}.md`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Markdown file exported');
+    });
 
     copyAllLinksBtn.addEventListener('click', () => {
         const links = Array.from(document.querySelectorAll('#links-list .link-card'))
