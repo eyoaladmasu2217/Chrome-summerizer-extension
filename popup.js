@@ -489,14 +489,25 @@ const loadHistory = (searchQuery = '') => {
             const header = document.createElement('div');
             header.className = 'history-header';
 
+            const sourceGroup = document.createElement('div');
+            sourceGroup.className = 'history-source-group';
+
+            const favicon = document.createElement('img');
+            favicon.className = 'history-favicon';
+            favicon.src = `https://www.google.com/s2/favicons?domain=${new URL(item.url).hostname}&sz=32`;
+            favicon.alt = '';
+
             const title = document.createElement('h4');
             title.textContent = item.title || 'Untitled';
+
+            sourceGroup.appendChild(favicon);
+            sourceGroup.appendChild(title);
 
             const date = document.createElement('span');
             date.className = 'history-date';
             date.textContent = new Date(item.date).toLocaleDateString();
 
-            header.appendChild(title);
+            header.appendChild(sourceGroup);
             header.appendChild(date);
 
             const preview = document.createElement('p');

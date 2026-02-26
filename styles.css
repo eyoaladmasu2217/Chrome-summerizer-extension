@@ -809,3 +809,23 @@ textarea#summary::placeholder {
          f o n t - s i z e :   1 2 p x ; 
  }  
  
+ . h i s t o r y - s o u r c e - g r o u p   { 
+         d i s p l a y :   f l e x ; 
+         a l i g n - i t e m s :   c e n t e r ; 
+         g a p :   8 p x ; 
+         f l e x :   1 ; 
+         o v e r f l o w :   h i d d e n ; 
+ } 
+ 
+ . h i s t o r y - f a v i c o n   { 
+         w i d t h :   1 6 p x ; 
+         h e i g h t :   1 6 p x ; 
+         b o r d e r - r a d i u s :   4 p x ; 
+ } 
+ 
+ . h i s t o r y - h e a d e r   h 4   { 
+         w h i t e - s p a c e :   n o w r a p ; 
+         o v e r f l o w :   h i d d e n ; 
+         t e x t - o v e r f l o w :   e l l i p s i s ; 
+ }  
+ 
