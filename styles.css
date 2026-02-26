@@ -112,13 +112,18 @@ h1 {
 
 /* Content Area */
 .tab-content {
-    animation: fadeIn 0.3s ease-out;
+    display: none;
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes fadeIn {
+.tab-content.active {
+    display: block;
+}
+
+@keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(15px);
     }
 
     to {

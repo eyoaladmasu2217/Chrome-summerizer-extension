@@ -85,8 +85,9 @@ const initTabs = () => {
         activeTab.setAttribute('aria-selected', 'true');
         inactiveTab.classList.remove('active');
         inactiveTab.setAttribute('aria-selected', 'false');
-        activeSection.style.display = 'block';
-        inactiveSection.style.display = 'none';
+
+        activeSection.classList.add('active');
+        inactiveSection.classList.remove('active');
 
         if (activeTab.id === 'history-tab') {
             loadHistory();
@@ -106,6 +107,7 @@ const initEventListeners = () => {
     const settingsTrigger = document.getElementById('settings-trigger');
     const textarea = document.getElementById('summary');
     const historySearch = document.getElementById('history-search');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
 
     summarizeBtn.addEventListener('click', handleSummarize);
 
@@ -214,7 +216,6 @@ const initEventListeners = () => {
         });
     });
 };
-
 
 const updateStepStatus = (stepNumber, status) => {
     const steps = document.querySelectorAll('.step');
@@ -540,6 +541,3 @@ const loadHistory = (searchQuery = '') => {
         };
     });
 };
-
-
-
