@@ -3,6 +3,8 @@ const DEFAULT_MODEL = 'Summerizer';
 
 // State management
 let currentSummary = '';
+let chatHistory = [];
+
 
 window.addEventListener('DOMContentLoaded', () => {
     // Initial UI Setup
@@ -118,9 +120,17 @@ const initEventListeners = () => {
     const markdownBtn = document.getElementById('markdown-btn');
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const copyAllLinksBtn = document.getElementById('copy-all-links');
+    const sendChatBtn = document.getElementById('send-chat-btn');
+    const chatInput = document.getElementById('chat-input');
 
     summarizeBtn.addEventListener('click', handleSummarize);
     regenerateBtn.addEventListener('click', handleSummarize);
+
+    sendChatBtn.addEventListener('click', handleChat);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleChat();
+    });
+
 
     markdownBtn.addEventListener('click', () => {
         const text = textarea.value;
