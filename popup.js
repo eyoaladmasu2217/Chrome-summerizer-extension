@@ -4,6 +4,8 @@ const DEFAULT_MODEL = 'Summerizer';
 // State management
 let currentSummary = '';
 let chatHistory = [];
+let synth = window.speechSynthesis;
+let isReading = false;
 
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -120,8 +122,11 @@ const initEventListeners = () => {
     const markdownBtn = document.getElementById('markdown-btn');
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const copyAllLinksBtn = document.getElementById('copy-all-links');
-    const sendChatBtn = document.getElementById('send-chat-btn');
     const chatInput = document.getElementById('chat-input');
+    const readAloudBtn = document.getElementById('read-aloud-btn');
+    const pauseTtsBtn = document.getElementById('pause-tts-btn');
+    const stopTtsBtn = document.getElementById('stop-tts-btn');
+    const voiceSelect = document.getElementById('voice-select');
 
     summarizeBtn.addEventListener('click', handleSummarize);
     regenerateBtn.addEventListener('click', handleSummarize);
@@ -130,6 +135,16 @@ const initEventListeners = () => {
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleChat();
     });
+
+    readAloudBtn.addEventListener('click', handleToggleSpeech);
+    pauseTtsBtn.addEventListener('click', handlePauseSpeech);
+    stopTtsBtn.addEventListener('click', handleStopSpeech);
+
+    // Initialize voices
+    setTimeout(populateVoices, 100);
+    if (synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = populateVoices;
+    }
 
 
     markdownBtn.addEventListener('click', () => {
