@@ -77,6 +77,20 @@
                     </div>
                 </div>
 
+                <!-- Voice Reader Controls -->
+                <div id="tts-controls" class="tts-controls" style="display: none;">
+                    <button id="read-aloud-btn" class="icon-btn" title="Read Aloud">
+                        <i class="material-icons-round">volume_up</i>
+                    </button>
+                    <button id="pause-tts-btn" class="icon-btn" title="Pause" style="display: none;">
+                        <i class="material-icons-round">pause</i>
+                    </button>
+                    <button id="stop-tts-btn" class="icon-btn" title="Stop" style="display: none;">
+                        <i class="material-icons-round">stop</i>
+                    </button>
+                    <select id="voice-select" class="voice-select" aria-label="Select Voice"></select>
+                </div>
+
                 <div id="count-container" class="count-container" style="display: none;">
                     <span id="char-count">0 characters</span>
                     <span class="count-divider">•</span>
