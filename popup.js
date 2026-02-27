@@ -348,6 +348,7 @@ const handleSummarize = async () => {
         document.getElementById('count-container').style.display = 'flex';
         document.getElementById('regenerate-btn').style.display = 'flex';
         document.getElementById('chat-container').style.display = 'flex';
+        document.getElementById('tts-controls').style.display = 'flex';
         chatHistory = []; // Reset chat history for new summary
         document.getElementById('chat-messages').innerHTML = ''; // Clear old messages
 
@@ -734,5 +735,93 @@ const handleChat = async () => {
         showToast(error.message, 'error');
     }
 };
+
+const populateVoices = () => {
+    const voiceSelect = document.getElementById('voice-select');
+    if (!voiceSelect) return;
+
+    const voices = synth.getVoices();
+    voiceSelect.innerHTML = '';
+
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+        option.textContent = `${voice.name} (${voice.lang})`;
+        option.value = voice.name;
+        if (voice.default) option.selected = true;
+        voiceSelect.appendChild(option);
+    });
+};
+
+const handleToggleSpeech = () => {
+    const text = document.getElementById('summary').value;
+    if (!text) return;
+
+    if (synth.speaking && !synth.paused) {
+        handlePauseSpeech();
+        return;
+    }
+
+    if (synth.paused) {
+        synth.resume();
+        updateTtsUI(true);
+        return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const selectedVoiceName = document.getElementById('voice-select').value;
+    const voices = synth.getVoices();
+    utterance.voice = voices.find(v => v.name === selectedVoiceName);
+
+    utterance.onend = () => {
+        updateTtsUI(false);
+        isReading = false;
+    };
+
+    utterance.onerror = () => {
+        updateTtsUI(false);
+        isReading = false;
+    };
+
+    synth.speak(utterance);
+    updateTtsUI(true);
+    isReading = true;
+};
+
+const handlePauseSpeech = () => {
+    if (synth.speaking && !synth.paused) {
+        synth.pause();
+        updateTtsUI(false, true);
+    }
+};
+
+const handleStopSpeech = () => {
+    synth.cancel();
+    updateTtsUI(false);
+    isReading = false;
+};
+
+const updateTtsUI = (playing, paused = false) => {
+    const readAloudBtn = document.getElementById('read-aloud-btn');
+    const pauseTtsBtn = document.getElementById('pause-tts-btn');
+    const stopTtsBtn = document.getElementById('stop-tts-btn');
+    const icon = readAloudBtn.querySelector('i');
+
+    if (playing) {
+        icon.textContent = 'pause';
+        readAloudBtn.classList.add('playing');
+        pauseTtsBtn.style.display = 'none';
+        stopTtsBtn.style.display = 'flex';
+    } else if (paused) {
+        icon.textContent = 'play_arrow';
+        readAloudBtn.classList.remove('playing');
+        stopTtsBtn.style.display = 'flex';
+    } else {
+        icon.textContent = 'volume_up';
+        readAloudBtn.classList.remove('playing');
+        pauseTtsBtn.style.display = 'none';
+        stopTtsBtn.style.display = 'none';
+    }
+};
+
 
 
