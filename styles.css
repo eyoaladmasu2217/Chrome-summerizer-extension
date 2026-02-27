@@ -965,3 +965,72 @@ textarea#summary::placeholder {
         transform: translateY(-5px);
     }
 }
+
+/* Voice Reader Styles */
+.tts-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--glass-highlight);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    margin: 12px 0;
+    backdrop-filter: blur(5px);
+    animation: fadeInTTS 0.4s ease;
+}
+
+@keyframes fadeInTTS {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.voice-select {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.voice-select:hover {
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.voice-select option {
+    background: var(--bg-dark);
+    color: var(--text-main);
+}
+
+#read-aloud-btn.playing {
+    color: var(--primary);
+    animation: ripple 1.5s infinite;
+}
+
+@keyframes ripple {
+    0% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    }
+}
