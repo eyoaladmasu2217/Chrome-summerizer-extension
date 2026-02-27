@@ -336,9 +336,26 @@ const handleSummarize = async () => {
         updateStats(minutes);
 
         updateStepStatus(3, 'active');
-        const cleanText = summary.replace(/<[^>]*>/g, '');
+
+        // Extract metadata if present
+        let category = 'General';
+        let sentiment = 'Neutral';
+        let displaySummary = summary;
+
+        const metadataMatch = summary.match(/\[METADATA\]:\s*CATEGORY:\s*([^,]+),\s*SENTIMENT:\s*([^\n]+)/i);
+        if (metadataMatch) {
+            category = metadataMatch[1].trim();
+            sentiment = metadataMatch[2].trim();
+            displaySummary = summary.replace(/\[METADATA\]:[^\n]+\n?/, '').trim();
+        }
+
+        document.getElementById('content-category').textContent = category;
+        document.getElementById('content-sentiment').textContent = sentiment;
+        document.getElementById('insights-bar').style.display = 'flex';
+
+        const cleanText = displaySummary.replace(/<[^>]*>/g, '');
         textarea.value = cleanText;
-        currentSummary = summary;
+        currentSummary = displaySummary;
 
         // Update counts
         const charCount = cleanText.length;
@@ -505,6 +522,7 @@ const getSummary = async (text, links = []) => {
                 role: 'system',
                 content: `You are an expert content analyst. Your task is to summarize the provided text in ${language}. 
                 Follow this structure:
+                [METADATA]: CATEGORY: <Single Word Category>, SENTIMENT: <Single Word Sentiment>
                 1. **💡 Key Takeaways**: List 3-5 most important points as bullet points with emojis.
                 2. **📝 Summary**: ${lengthInstruction} ${toneInstruction}
                 3. **🔗 References**: If links are provided, mention the most relevant ones naturally.

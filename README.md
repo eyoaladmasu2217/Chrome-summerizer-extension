@@ -43,6 +43,15 @@ Generated reports now include:
 - **Metadata**: Date, time, and page title.
 - **Pagination**: Professional multi-page support with automatic footer numbering.
 
+### 💬 AI Contextual Chat
+Engage in a follow-up conversation with the AI about the summary. Ask specific questions and get contextual answers without leaving the extension.
+
+### 🎙️ AI Voice Reader
+Listen to your summaries on the go. High-quality text-to-speech engine with customizable voices and real-time playback controls (Play/Pause/Stop).
+
+### 🔍 Smart Content Insights
+Instant categorization (e.g., News, Educational, Tech) and sentiment analysis (Positive, Neutral, Negative) for every page you summarize.
+
 ---
 
 ## 🎨 Premium Experience
