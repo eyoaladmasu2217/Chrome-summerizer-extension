@@ -332,6 +332,10 @@ const handleSummarize = async () => {
         document.getElementById('word-count').textContent = `${summaryWordCount} words`;
         document.getElementById('count-container').style.display = 'flex';
         document.getElementById('regenerate-btn').style.display = 'flex';
+        document.getElementById('chat-container').style.display = 'flex';
+        chatHistory = []; // Reset chat history for new summary
+        document.getElementById('chat-messages').innerHTML = ''; // Clear old messages
+
 
         const now = new Date().toLocaleTimeString();
         document.getElementById('last-updated-time').textContent = `Summarized at ${now}`;
@@ -639,3 +643,81 @@ const loadHistory = (searchQuery = '') => {
         };
     });
 };
+
+const appendMessage = (role, text) => {
+    const chatMessages = document.getElementById('chat-messages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-bubble ${role}`;
+    msgDiv.textContent = text;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+};
+
+const showChatLoading = (show) => {
+    const chatMessages = document.getElementById('chat-messages');
+    let loading = document.getElementById('chat-loading-indicator');
+
+    if (show && !loading) {
+        loading = document.createElement('div');
+        loading.id = 'chat-loading-indicator';
+        loading.className = 'chat-loading';
+        loading.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+        chatMessages.appendChild(loading);
+    } else if (!show && loading) {
+        loading.remove();
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+};
+
+const handleChat = async () => {
+    const chatInput = document.getElementById('chat-input');
+    const question = chatInput.value.trim();
+    if (!question || !currentSummary) return;
+
+    appendMessage('user', question);
+    chatInput.value = '';
+    showChatLoading(true);
+
+    try {
+        const settings = await chrome.storage.sync.get(['apiKey', 'aiModel']);
+        const apiKey = settings.apiKey;
+        const model = settings.aiModel || DEFAULT_MODEL;
+
+        if (!apiKey) throw new Error('API Key missing');
+
+        const messages = [
+            {
+                role: 'system',
+                content: `You are a helpful assistant discussing the following web content summary: "${currentSummary}". 
+                Answer the user's questions based on this summary and general knowledge. Keep answers concise.`
+            },
+            ...chatHistory,
+            { role: 'user', content: question }
+        ];
+
+        const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ model, messages, temperature: 0.7 })
+        });
+
+        if (!response.ok) throw new Error('Chat failed');
+        const data = await response.json();
+        const answer = data.choices[0].message.content;
+
+        showChatLoading(false);
+        appendMessage('ai', answer);
+
+        chatHistory.push({ role: 'user', content: question });
+        chatHistory.push({ role: 'assistant', content: answer });
+
+    } catch (error) {
+        showChatLoading(false);
+        showToast(error.message, 'error');
+    }
+};
+
+
