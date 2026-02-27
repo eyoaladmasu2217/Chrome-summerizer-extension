@@ -64,6 +64,19 @@
                 <textarea id="summary" readonly
                     placeholder="The AI summary will appear here once you click the button below..."
                     aria-label="Summary output"></textarea>
+
+                <!-- AI Chat Interface (Initially Hidden) -->
+                <div id="chat-container" class="chat-container" style="display: none;">
+                    <div id="chat-messages" class="chat-messages"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Ask a follow-up question..."
+                            aria-label="Chat input">
+                        <button id="send-chat-btn" class="icon-btn" title="Send Question">
+                            <i class="material-icons-round">send</i>
+                        </button>
+                    </div>
+                </div>
+
                 <div id="count-container" class="count-container" style="display: none;">
                     <span id="char-count">0 characters</span>
                     <span class="count-divider">•</span>
