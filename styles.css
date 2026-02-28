@@ -907,18 +907,20 @@ textarea#summary::placeholder {
 }
 
 .chat-bubble.user {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
     align-self: flex-end;
     border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
 .chat-bubble.ai {
-    background: var(--glass-highlight);
+    background: var(--card-bg);
     color: var(--text-main);
     align-self: flex-start;
     border: 1px solid var(--glass-border);
     border-bottom-left-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .chat-input-area {
