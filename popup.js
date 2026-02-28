@@ -128,8 +128,23 @@ const initEventListeners = () => {
     const stopTtsBtn = document.getElementById('stop-tts-btn');
     const voiceSelect = document.getElementById('voice-select');
 
+    const readingModeToggle = document.getElementById('reading-mode-toggle');
+    const exitReadingModeBtn = document.getElementById('exit-reading-mode');
+
     summarizeBtn.addEventListener('click', handleSummarize);
     regenerateBtn.addEventListener('click', handleSummarize);
+
+    readingModeToggle.addEventListener('click', () => {
+        if (!textarea.value) {
+            showToast('Generate a summary first!', 'error');
+            return;
+        }
+        document.body.classList.add('reading-mode');
+    });
+
+    exitReadingModeBtn.addEventListener('click', () => {
+        document.body.classList.remove('reading-mode');
+    });
 
     sendChatBtn.addEventListener('click', handleChat);
     const clearChatBtn = document.getElementById('clear-chat-btn');
