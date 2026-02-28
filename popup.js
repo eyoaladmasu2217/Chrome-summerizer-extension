@@ -7,6 +7,19 @@ let chatHistory = [];
 let synth = window.speechSynthesis;
 let isReading = false;
 
+const getRelativeTime = (timestamp) => {
+    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+    const diff = Date.now() - new Date(timestamp).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return rtf.format(-minutes, 'minute');
+    if (hours < 24) return rtf.format(-hours, 'hour');
+    return rtf.format(-days, 'day');
+};
+
 
 window.addEventListener('DOMContentLoaded', () => {
     // Initial UI Setup
@@ -637,7 +650,7 @@ const loadHistory = (searchQuery = '') => {
 
             const date = document.createElement('span');
             date.className = 'history-date';
-            date.textContent = new Date(item.date).toLocaleDateString();
+            date.textContent = getRelativeTime(item.date);
 
             header.appendChild(sourceGroup);
             header.appendChild(date);
