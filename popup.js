@@ -625,7 +625,10 @@ const getSummary = async (text, links = []) => {
 const loadHistory = (searchQuery = '') => {
     chrome.storage.local.get(['summaries'], (result) => {
         const historyList = document.getElementById('history-list');
+        const badge = document.getElementById('history-badge');
         let summaries = result.summaries || [];
+
+        if (badge) badge.textContent = summaries.length;
 
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
