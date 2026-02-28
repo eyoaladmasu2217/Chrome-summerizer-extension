@@ -603,7 +603,11 @@ const loadHistory = (searchQuery = '') => {
         }
 
         historyList.innerHTML = summaries.length === 0 ?
-            `<p class="empty-msg">${searchQuery ? 'No matches found.' : 'No history yet.'}</p>` : '';
+            `<div class="empty-state">
+                <i class="material-icons-round">history_toggle_off</i>
+                <p>${searchQuery ? 'No summaries match your search.' : 'Your summary history will appear here.'}</p>
+                ${searchQuery ? '' : '<p class="sub-text">Generate your first summary to get started!</p>'}
+            </div>` : '';
 
         summaries.forEach(item => {
             const div = document.createElement('div');
