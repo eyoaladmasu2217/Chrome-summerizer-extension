@@ -743,6 +743,9 @@ const loadHistory = (searchQuery = '') => {
                 if (item) {
                     navigator.clipboard.writeText(item.summary.replace(/<[^>]*>/g, '')).then(() => {
                         showToast('Copied history summary!');
+                        const originalHtml = btn.innerHTML;
+                        btn.innerHTML = '<i class="material-icons-round" style="font-size: 14px; color: var(--success);">check</i>';
+                        setTimeout(() => btn.innerHTML = originalHtml, 2000);
                     });
                 }
             } else if (btn.classList.contains('copy-url-btn')) {
