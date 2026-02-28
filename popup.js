@@ -6,6 +6,7 @@ let currentSummary = '';
 let chatHistory = [];
 let synth = window.speechSynthesis;
 let isReading = false;
+let showFavoritesOnly = false;
 
 const getRelativeTime = (timestamp) => {
     const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
@@ -209,6 +210,15 @@ const initEventListeners = () => {
         const query = e.target.value;
         loadHistory(query);
         clearSearchBtn.style.display = query ? 'flex' : 'none';
+    });
+
+    const filterFavBtn = document.getElementById('filter-fav-btn');
+
+    filterFavBtn.addEventListener('click', () => {
+        showFavoritesOnly = !showFavoritesOnly;
+        filterFavBtn.classList.toggle('active');
+        filterFavBtn.querySelector('i').textContent = showFavoritesOnly ? 'star' : 'star_outline';
+        loadHistory(historySearch.value);
     });
 
     clearSearchBtn.addEventListener('click', () => {
@@ -615,11 +625,15 @@ const loadHistory = (searchQuery = '') => {
             );
         }
 
+        if (showFavoritesOnly) {
+            summaries = summaries.filter(item => item.favorite);
+        }
+
         historyList.innerHTML = summaries.length === 0 ?
             `<div class="empty-state">
-                <i class="material-icons-round">history_toggle_off</i>
-                <p>${searchQuery ? 'No summaries match your search.' : 'Your summary history will appear here.'}</p>
-                ${searchQuery ? '' : '<p class="sub-text">Generate your first summary to get started!</p>'}
+                <i class="material-icons-round">${showFavoritesOnly ? 'star_outline' : 'history_toggle_off'}</i>
+                <p>${showFavoritesOnly ? 'No favorite summaries yet.' : (searchQuery ? 'No summaries match your search.' : 'Your summary history will appear here.')}</p>
+                ${(searchQuery || showFavoritesOnly) ? '' : '<p class="sub-text">Generate your first summary to get started!</p>'}
             </div>` : '';
 
         summaries.forEach(item => {
