@@ -935,6 +935,33 @@ textarea#summary::placeholder {
     border: 1px solid var(--glass-border);
     border-bottom-left-radius: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.chat-copy-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+    display: flex;
+}
+
+.chat-bubble:hover .chat-copy-btn {
+    opacity: 1;
+}
+
+.chat-copy-btn:hover {
+    color: var(--primary);
+}
+
+.chat-copy-btn i {
+    font-size: 14px;
 }
 
 .chat-input-area {

@@ -688,7 +688,25 @@ const appendMessage = (role, text) => {
     const chatMessages = document.getElementById('chat-messages');
     const msgDiv = document.createElement('div');
     msgDiv.className = `chat-bubble ${role}`;
-    msgDiv.textContent = text;
+
+    if (role === 'ai') {
+        const textSpan = document.createElement('span');
+        textSpan.textContent = text;
+        msgDiv.appendChild(textSpan);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'chat-copy-btn';
+        copyBtn.innerHTML = '<i class="material-icons-round">content_copy</i>';
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Answer copied!');
+            });
+        };
+        msgDiv.appendChild(copyBtn);
+    } else {
+        msgDiv.textContent = text;
+    }
+
     chatMessages.appendChild(msgDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 };
