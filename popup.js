@@ -684,7 +684,14 @@ const loadHistory = (searchQuery = '') => {
             copyUrlBtn.innerHTML = '<i class="material-icons-round" style="font-size: 14px;">link</i>';
             copyUrlBtn.title = 'Copy Source URL';
 
+            const favoriteBtn = document.createElement('button');
+            favoriteBtn.className = `favorite-btn ${item.favorite ? 'active' : ''}`;
+            favoriteBtn.dataset.id = item.id;
+            favoriteBtn.innerHTML = `<i class="material-icons-round" style="font-size: 14px;">${item.favorite ? 'star' : 'star_outline'}</i>`;
+            favoriteBtn.title = item.favorite ? 'Unfavorite' : 'Favorite';
+
             actions.appendChild(viewBtn);
+            actions.appendChild(favoriteBtn);
             actions.appendChild(copyHistoryBtn);
             actions.appendChild(copyUrlBtn);
             actions.appendChild(deleteBtn);
@@ -724,6 +731,14 @@ const loadHistory = (searchQuery = '') => {
             } else if (btn.classList.contains('delete-btn')) {
                 const updated = summaries.filter(s => s.id !== id);
                 chrome.storage.local.set({ summaries: updated }, loadHistory);
+            } else if (btn.classList.contains('favorite-btn')) {
+                const updated = summaries.map(s => {
+                    if (s.id === id) {
+                        return { ...s, favorite: !s.favorite };
+                    }
+                    return s;
+                });
+                chrome.storage.local.set({ summaries: updated }, () => loadHistory(document.getElementById('history-search').value));
             }
         };
     });

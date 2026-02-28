@@ -562,6 +562,20 @@ textarea#summary::placeholder {
     color: white;
 }
 
+.favorite-btn {
+    background: var(--glass-highlight);
+    color: var(--text-muted);
+}
+
+.favorite-btn:hover {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.favorite-btn.active {
+    color: #ffc107;
+}
+
 .history-controls {
     display: flex;
     justify-content: space-between;
