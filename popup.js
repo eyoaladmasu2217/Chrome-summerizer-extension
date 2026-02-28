@@ -132,6 +132,12 @@ const initEventListeners = () => {
     regenerateBtn.addEventListener('click', handleSummarize);
 
     sendChatBtn.addEventListener('click', handleChat);
+    const clearChatBtn = document.getElementById('clear-chat-btn');
+    clearChatBtn.addEventListener('click', () => {
+        document.getElementById('chat-messages').innerHTML = '';
+        chatHistory = [];
+        showToast('Chat cleared');
+    });
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleChat();
     });
