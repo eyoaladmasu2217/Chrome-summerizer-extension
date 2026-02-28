@@ -290,6 +290,19 @@ const initEventListeners = () => {
             setTimeout(() => shareBtn.innerHTML = original, 2000);
         });
     });
+
+    const scrollTopBtn = document.getElementById('scroll-top-btn');
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            scrollTopBtn.style.display = 'flex';
+        } else {
+            scrollTopBtn.style.display = 'none';
+        }
+    });
+
+    scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 };
 
 const updateStepStatus = (stepNumber, status) => {

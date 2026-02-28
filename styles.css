@@ -672,6 +672,21 @@ textarea#summary::placeholder {
     color: var(--text-main);
 }
 
+.fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--primary) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    z-index: 100;
+}
+
+.fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+}
+
 /* Toast Notifications */
 #toast-container {
     position: fixed;
