@@ -145,8 +145,18 @@ const initEventListeners = () => {
     const readingModeToggle = document.getElementById('reading-mode-toggle');
     const exitReadingModeBtn = document.getElementById('exit-reading-mode');
 
+    const emailBtn = document.getElementById('email-btn');
+
     summarizeBtn.addEventListener('click', handleSummarize);
     regenerateBtn.addEventListener('click', handleSummarize);
+
+    emailBtn.addEventListener('click', () => {
+        const text = textarea.value;
+        if (!text) return;
+        const subject = encodeURIComponent('Summary from Summarize AI');
+        const body = encodeURIComponent(text);
+        window.open(`mailto:?subject=${subject}&body=${body}`);
+    });
 
     readingModeToggle.addEventListener('click', () => {
         if (!textarea.value) {
