@@ -975,6 +975,11 @@ textarea#summary::placeholder {
     letter-spacing: 0.1em;
 }
 
+.chat-header-actions {
+    display: flex;
+    gap: 4px;
+}
+
 .chat-messages {
     max-height: 200px;
     overflow-y: auto;

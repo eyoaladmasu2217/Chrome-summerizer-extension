@@ -85,9 +85,14 @@
                 <div id="chat-container" class="chat-container" style="display: none;">
                     <div class="chat-header">
                         <h4>AI Assistant</h4>
-                        <button id="clear-chat-btn" class="icon-btn tiny" title="Clear Chat">
-                            <i class="material-icons-round">delete_outline</i>
-                        </button>
+                        <div class="chat-header-actions">
+                            <button id="copy-chat-btn" class="icon-btn tiny" title="Copy Chat History">
+                                <i class="material-icons-round">content_copy</i>
+                            </button>
+                            <button id="clear-chat-btn" class="icon-btn tiny" title="Clear Chat">
+                                <i class="material-icons-round">delete_outline</i>
+                            </button>
+                        </div>
                     </div>
                     <div id="chat-messages" class="chat-messages"></div>
                     <div class="chat-input-area">

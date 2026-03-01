@@ -229,6 +229,16 @@ const initEventListeners = () => {
         if (e.key === 'Enter') handleChat();
     });
 
+    const copyChatBtn = document.getElementById('copy-chat-btn');
+    copyChatBtn.addEventListener('click', () => {
+        if (chatHistory.length === 0) return;
+        const formatted = chatHistory.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n');
+        navigator.clipboard.writeText(formatted).then(() => {
+            triggerHaptic(copyChatBtn);
+            showToast('Chat history copied!');
+        });
+    });
+
     readAloudBtn.addEventListener('click', handleToggleSpeech);
     pauseTtsBtn.addEventListener('click', handlePauseSpeech);
     stopTtsBtn.addEventListener('click', handleStopSpeech);
