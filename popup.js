@@ -1,5 +1,28 @@
-// AIML_API_KEY removed for security. Now retrieved from storage.
 const DEFAULT_MODEL = 'Summerizer';
+
+/**
+ * Professional Logging System
+ * Handles application logs with consistent formatting and toggleable debug mode
+ */
+class Logger {
+    static isDebug = true; // Can be linked to a setting if needed
+
+    static log(message, ...args) {
+        if (this.isDebug) console.log(`[SummarizeAI][LOG] ${message}`, ...args);
+    }
+
+    static error(message, ...args) {
+        console.error(`[SummarizeAI][ERROR] ${message}`, ...args);
+    }
+
+    static info(message, ...args) {
+        if (this.isDebug) console.info(`[SummarizeAI][INFO] ${message}`, ...args);
+    }
+
+    static dev(message, ...args) {
+        if (this.isDebug) console.debug(`[SummarizeAI][DEV] ${message}`, ...args);
+    }
+}
 
 // State management
 let currentSummary = '';
@@ -506,7 +529,7 @@ const handleSummarize = async () => {
 
 
     } catch (error) {
-        console.error('Summary error:', error);
+        Logger.error('Summary error:', error);
         showToast(error.message || 'An error occurred during summarization.', 'error');
     } finally {
         summarizeBtn.innerText = 'Generate Summary';
