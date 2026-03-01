@@ -839,16 +839,25 @@ const appendMessage = (role, text) => {
 
 const showChatLoading = (show) => {
     const chatMessages = document.getElementById('chat-messages');
+    const sendBtn = document.getElementById('send-chat-btn');
     let loading = document.getElementById('chat-loading-indicator');
 
-    if (show && !loading) {
-        loading = document.createElement('div');
-        loading.id = 'chat-loading-indicator';
-        loading.className = 'chat-loading';
-        loading.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-        chatMessages.appendChild(loading);
-    } else if (!show && loading) {
-        loading.remove();
+    if (show) {
+        if (!loading) {
+            loading = document.createElement('div');
+            loading.id = 'chat-loading-indicator';
+            loading.className = 'chat-loading';
+            loading.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+            chatMessages.appendChild(loading);
+        }
+        sendBtn.disabled = true;
+        sendBtn.querySelector('i').textContent = 'sync';
+        sendBtn.querySelector('i').classList.add('rotating');
+    } else {
+        if (loading) loading.remove();
+        sendBtn.disabled = false;
+        sendBtn.querySelector('i').textContent = 'send';
+        sendBtn.querySelector('i').classList.remove('rotating');
     }
     chatMessages.scrollTop = chatMessages.scrollHeight;
 };
