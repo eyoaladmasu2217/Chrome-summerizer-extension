@@ -1363,6 +1363,33 @@ body.reading-mode .summary-field {
     min-height: 460px;
 }
 
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    text-align: center;
+    color: var(--error);
+}
+
+.error-state i {
+    font-size: 48px;
+    opacity: 0.8;
+}
+
+.error-state p {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.error-state .buttons {
+    width: auto !important;
+    padding: 8px 20px;
+}
+
 body.reading-mode textarea#summary {
     height: 400px;
     font-size: 16px;

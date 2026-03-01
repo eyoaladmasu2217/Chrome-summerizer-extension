@@ -208,6 +208,9 @@ const initEventListeners = () => {
     });
 
     const eli5Btn = document.getElementById('eli5-btn');
+    const retryBtn = document.getElementById('retry-btn');
+
+    retryBtn.addEventListener('click', () => handleSummarize());
 
     summarizeBtn.addEventListener('click', () => handleSummarize());
     regenerateBtn.addEventListener('click', () => handleSummarize());
@@ -502,11 +505,13 @@ const handleSummarize = async (isEli5 = false) => {
     const linksSection = document.getElementById('links-section');
     const skeleton = document.getElementById('skeleton-loader');
     const statusSteps = document.getElementById('status-steps');
+    const errorContainer = document.getElementById('error-container');
 
     summarizeBtn.innerText = 'Summarizing...';
     summarizeBtn.disabled = true;
     textarea.style.display = 'none';
     statusSteps.style.display = 'flex';
+    errorContainer.style.display = 'none';
 
     // Reset steps
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'completed'));
@@ -651,6 +656,9 @@ const handleSummarize = async (isEli5 = false) => {
 
     } catch (error) {
         Logger.error('Summary error:', error);
+        document.getElementById('error-message').textContent = error.message || 'An error occurred during summarization.';
+        document.getElementById('error-container').style.display = 'flex';
+        document.getElementById('status-steps').style.display = 'none';
         showToast(error.message || 'An error occurred during summarization.', 'error');
     } finally {
         summarizeBtn.innerText = 'Generate Summary';
