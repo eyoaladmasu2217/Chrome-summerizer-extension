@@ -207,9 +207,20 @@ const initEventListeners = () => {
     sendChatBtn.addEventListener('click', handleChat);
     const clearChatBtn = document.getElementById('clear-chat-btn');
     clearChatBtn.addEventListener('click', () => {
-        document.getElementById('chat-messages').innerHTML = '';
-        chatHistory = [];
-        showToast('Chat cleared');
+        if (chatHistory.length === 0) return;
+        if (confirm('Are you sure you want to clear the conversation?')) {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.style.opacity = '0';
+            chatMessages.style.transform = 'translateY(10px)';
+
+            setTimeout(() => {
+                chatMessages.innerHTML = '';
+                chatMessages.style.opacity = '1';
+                chatMessages.style.transform = 'translateY(0)';
+                chatHistory = [];
+                showToast('Chat cleared');
+            }, 300);
+        }
     });
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleChat();
