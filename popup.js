@@ -144,8 +144,13 @@ const initTabs = () => {
         inactiveTab.classList.remove('active');
         inactiveTab.setAttribute('aria-selected', 'false');
 
-        activeSection.classList.add('active');
+        activeSection.style.display = 'block';
+        inactiveSection.style.display = 'none';
         inactiveSection.classList.remove('active');
+
+        // Trigger reflow then add active class for transition
+        void activeSection.offsetWidth;
+        activeSection.classList.add('active');
 
         if (activeTab.id === 'history-tab') {
             loadHistory();
