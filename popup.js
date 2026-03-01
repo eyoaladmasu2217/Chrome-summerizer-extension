@@ -542,8 +542,10 @@ const handleSummarize = async (isEli5 = false) => {
         // Update counts
         const charCount = cleanText.length;
         const summaryWordCount = cleanText.trim().split(/\s+/).filter(w => w.length > 0).length;
+        const sumMinutes = Math.max(1, Math.ceil(summaryWordCount / 200));
         document.getElementById('char-count').textContent = `${charCount} characters`;
         document.getElementById('word-count').textContent = `${summaryWordCount} words`;
+        document.getElementById('sum-reading-time').textContent = `~${sumMinutes} min read`;
         document.getElementById('count-container').style.display = 'flex';
         document.getElementById('regenerate-btn').style.display = 'flex';
         document.getElementById('eli5-btn').style.display = 'flex';
