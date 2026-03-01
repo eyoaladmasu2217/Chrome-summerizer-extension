@@ -90,6 +90,17 @@ const showToast = (message, type = 'success') => {
     }, 3000);
 };
 
+/**
+ * Visual Haptic Feedback
+ * Triggers a subtle pulse animation on an element
+ */
+const triggerHaptic = (element) => {
+    if (!element) return;
+    element.classList.remove('haptic-pulse');
+    void element.offsetWidth; // Force reflow
+    element.classList.add('haptic-pulse');
+};
+
 const initSettings = () => {
     const themeToggle = document.getElementById('theme-toggle');
     const autocopyChip = document.getElementById('autocopy-chip');
@@ -281,6 +292,7 @@ const initEventListeners = () => {
     copyBtn.addEventListener('click', () => {
         const text = textarea.value;
         if (!text) return;
+        triggerHaptic(copyBtn);
         navigator.clipboard.writeText(text).then(() => {
             showToast('Copied to clipboard!');
             const originalText = copyBtn.innerHTML;
@@ -767,6 +779,7 @@ const loadHistory = (searchQuery = '') => {
             } else if (btn.classList.contains('copy-history-btn')) {
                 const item = summaries.find(s => s.id === id);
                 if (item) {
+                    triggerHaptic(btn);
                     navigator.clipboard.writeText(item.summary.replace(/<[^>]*>/g, '')).then(() => {
                         showToast('Copied history summary!');
                         const originalHtml = btn.innerHTML;
