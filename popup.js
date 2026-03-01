@@ -239,6 +239,29 @@ const initEventListeners = () => {
         });
     });
 
+    const exportChatBtn = document.getElementById('export-chat-btn');
+    exportChatBtn.addEventListener('click', async () => {
+        if (chatHistory.length === 0) return;
+
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const title = tab?.title || 'Web Content';
+
+        let mdContent = `# Chat History: ${title}\n\n`;
+        mdContent += `*Source: ${tab?.url || 'N/A'}*\n`;
+        mdContent += `*Date: ${new Date().toLocaleString()}*\n\n---\n\n`;
+
+        mdContent += chatHistory.map(m => `### ${m.role === 'user' ? '👤 User' : '🤖 AI'}\n${m.content}`).join('\n\n');
+
+        const blob = new Blob([mdContent], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `chat-history-${Date.now()}.md`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Chat history exported as Markdown');
+    });
+
     readAloudBtn.addEventListener('click', handleToggleSpeech);
     pauseTtsBtn.addEventListener('click', handlePauseSpeech);
     stopTtsBtn.addEventListener('click', handleStopSpeech);
