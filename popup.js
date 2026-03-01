@@ -489,17 +489,28 @@ const handleSummarize = async (isEli5 = false) => {
         // Extract metadata if present
         let category = 'General';
         let sentiment = 'Neutral';
+        let keywords = 'N/A';
         let displaySummary = summary;
 
-        const metadataMatch = summary.match(/\[METADATA\]:\s*CATEGORY:\s*([^,]+),\s*SENTIMENT:\s*([^\n]+)/i);
+        const metadataMatch = summary.match(/\[METADATA\]:\s*CATEGORY:\s*([^,]+),\s*SENTIMENT:\s*([^,]+),\s*KEYWORDS:\s*([^\n]+)/i);
         if (metadataMatch) {
             category = metadataMatch[1].trim();
             sentiment = metadataMatch[2].trim();
+            keywords = metadataMatch[3].trim();
             displaySummary = summary.replace(/\[METADATA\]:[^\n]+\n?/, '').trim();
+        } else {
+            // Fallback for older metadata format if any
+            const oldMatch = summary.match(/\[METADATA\]:\s*CATEGORY:\s*([^,]+),\s*SENTIMENT:\s*([^\n]+)/i);
+            if (oldMatch) {
+                category = oldMatch[1].trim();
+                sentiment = oldMatch[2].trim();
+                displaySummary = summary.replace(/\[METADATA\]:[^\n]+\n?/, '').trim();
+            }
         }
 
         document.getElementById('content-category').textContent = category;
         document.getElementById('content-sentiment').textContent = sentiment;
+        document.getElementById('content-keywords').textContent = keywords;
         document.getElementById('insights-bar').style.display = 'flex';
 
         const cleanText = displaySummary.replace(/<[^>]*>/g, '');
@@ -675,7 +686,7 @@ const getSummary = async (text, links = [], isEli5 = false) => {
                 role: 'system',
                 content: `You are an expert content analyst. Your task is to summarize the provided text in ${language}. 
                 Follow this structure:
-                [METADATA]: CATEGORY: <Single Word Category>, SENTIMENT: <Single Word Sentiment>
+                [METADATA]: CATEGORY: <Single Word Category>, SENTIMENT: <Single Word Sentiment>, KEYWORDS: <3-5 comma separated keywords>
                 1. **💡 Key Takeaways**: List 3-5 most important points as bullet points with emojis.
                 2. **📝 Summary**: ${lengthInstruction} ${toneInstruction}
                 3. **🔗 References**: If links are provided, mention the most relevant ones naturally.
