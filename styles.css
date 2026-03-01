@@ -1315,6 +1315,38 @@ textarea#summary::placeholder {
     font-size: 10px;
 }
 
+/* Banners */
+.banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    font-size: 11px;
+    border: 1px solid var(--glass-border);
+}
+
+.error-banner {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.banner-content {
+    flex: 1;
+}
+
+.banner-content p {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.banner-content span {
+    opacity: 0.8;
+}
+
 body.reading-mode .header,
 body.reading-mode .tabs,
 body.reading-mode .stats-bar,

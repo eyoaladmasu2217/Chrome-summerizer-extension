@@ -52,7 +52,19 @@ window.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
     loadHistory();
     loadStats();
+    checkApiKey();
 });
+
+const checkApiKey = () => {
+    chrome.storage.sync.get(['apiKey'], (result) => {
+        const warning = document.getElementById('api-key-warning');
+        if (!result.apiKey) {
+            warning.style.display = 'flex';
+        } else {
+            warning.style.display = 'none';
+        }
+    });
+};
 
 const loadStats = () => {
     chrome.storage.local.get(['stats'], (result) => {
@@ -185,6 +197,15 @@ const initEventListeners = () => {
     const exitReadingModeBtn = document.getElementById('exit-reading-mode');
 
     const emailBtn = document.getElementById('email-btn');
+    const configureKeyBtn = document.getElementById('configure-key-btn');
+
+    configureKeyBtn.addEventListener('click', () => {
+        if (chrome.runtime.openOptionsPage) {
+            chrome.runtime.openOptionsPage();
+        } else {
+            window.open(chrome.runtime.getURL('options.html'));
+        }
+    });
 
     const eli5Btn = document.getElementById('eli5-btn');
 
