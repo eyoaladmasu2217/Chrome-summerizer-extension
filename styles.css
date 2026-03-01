@@ -1414,6 +1414,28 @@ body.reading-mode textarea#summary {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+.history-meta-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sentiment-dot {
+    opacity: 0.8;
+}
+
+.sentiment-dot.pos {
+    color: var(--success);
+}
+
+.sentiment-dot.neg {
+    color: var(--error);
+}
+
+.sentiment-dot.neu {
+    color: var(--text-muted);
+}
+
 body.reading-mode #exit-reading-mode {
     display: flex;
 }

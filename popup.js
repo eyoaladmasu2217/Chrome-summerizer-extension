@@ -611,6 +611,7 @@ const handleSummarize = async (isEli5 = false) => {
             title: tab.title,
             summary: summary,
             model: settings.aiModel || DEFAULT_MODEL,
+            sentiment: sentiment,
             date: new Date().toISOString()
         };
 
@@ -835,7 +836,25 @@ const loadHistory = (searchQuery = '') => {
             date.textContent = getRelativeTime(item.date);
 
             header.appendChild(sourceGroup);
-            header.appendChild(date);
+
+            const metaGroup = document.createElement('div');
+            metaGroup.className = 'history-meta-group';
+
+            if (item.sentiment) {
+                const sentimentIcon = document.createElement('i');
+                sentimentIcon.className = 'material-icons-round sentiment-dot';
+                sentimentIcon.style.fontSize = '12px';
+
+                const s = item.sentiment.toLowerCase();
+                if (s.includes('pos')) { sentimentIcon.textContent = 'sentiment_very_satisfied'; sentimentIcon.classList.add('pos'); }
+                else if (s.includes('neg')) { sentimentIcon.textContent = 'sentiment_very_dissatisfied'; sentimentIcon.classList.add('neg'); }
+                else { sentimentIcon.textContent = 'sentiment_neutral'; sentimentIcon.classList.add('neu'); }
+
+                metaGroup.appendChild(sentimentIcon);
+            }
+
+            metaGroup.appendChild(date);
+            header.appendChild(metaGroup);
 
             const preview = document.createElement('p');
             preview.className = 'history-preview';
