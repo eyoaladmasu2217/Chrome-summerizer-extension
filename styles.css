@@ -959,6 +959,19 @@ textarea#summary::placeholder {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    position: relative;
+}
+
+.chat-fab {
+    position: absolute;
+    bottom: 60px;
+    right: 12px;
+    background: var(--primary) !important;
+    color: white !important;
+    width: 32px !important;
+    height: 32px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10;
 }
 
 .chat-header {

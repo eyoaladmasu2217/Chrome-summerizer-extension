@@ -229,6 +229,18 @@ const initEventListeners = () => {
         if (e.key === 'Enter') handleChat();
     });
 
+    const chatMessages = document.getElementById('chat-messages');
+    const chatScrollBottom = document.getElementById('chat-scroll-bottom');
+
+    chatMessages.addEventListener('scroll', () => {
+        const isAtBottom = chatMessages.scrollHeight - chatMessages.scrollTop <= chatMessages.clientHeight + 50;
+        chatScrollBottom.style.display = isAtBottom ? 'none' : 'flex';
+    });
+
+    chatScrollBottom.addEventListener('click', () => {
+        chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+    });
+
     const copyChatBtn = document.getElementById('copy-chat-btn');
     copyChatBtn.addEventListener('click', () => {
         if (chatHistory.length === 0) return;
