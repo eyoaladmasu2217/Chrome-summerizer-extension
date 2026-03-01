@@ -44,13 +44,26 @@ Generated reports now include:
 - **Pagination**: Professional multi-page support with automatic footer numbering.
 
 ### 💬 AI Contextual Chat
-Engage in a follow-up conversation with the AI about the summary. Ask specific questions and get contextual answers without leaving the extension.
+Engage in a follow-up conversation with the AI about the summary. 
+- **Chat Persistence**: Remembers context within the session.
+- **Export History**: Download your entire AI conversation as a Markdown file.
+- **Quick Copy**: One-click to copy the whole chat for your notes.
+- **Auto-Navigation**: "Scroll to bottom" helper for long conversations.
 
 ### 🎙️ AI Voice Reader
 Listen to your summaries on the go. High-quality text-to-speech engine with customizable voices and real-time playback controls (Play/Pause/Stop).
 
 ### 🔍 Smart Content Insights
-Instant categorization (e.g., News, Educational, Tech) and sentiment analysis (Positive, Neutral, Negative) for every page you summarize.
+Instant categorization (e.g., News, Educational, Tech), sentiment analysis (Positive, Neutral, Negative), and **Keyword Extraction** for every page you summarize.
+
+### 👶 ELI5 (Explain Like I'm 5)
+A specialized summarization mode that simplifies complex topics into child-friendly language with relatable analogies.
+
+### ⌨️ Keyboard Mastery
+Power users can now use **Ctrl + Enter** to quickly trigger a new summary from the main interface.
+
+### 🛡️ Professional Error Handling
+Robust retry mechanism and inline API Key detection to ensure a smooth, uninterrupted discovery flow.
 
 ---
 
