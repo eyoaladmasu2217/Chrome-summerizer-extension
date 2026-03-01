@@ -336,6 +336,16 @@ const initEventListeners = () => {
         }
     });
 
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            const summarizeBtn = document.getElementById('summarize-btn');
+            if (!summarizeBtn.disabled) {
+                handleSummarize();
+            }
+        }
+    });
+
     copyBtn.addEventListener('click', () => {
         const text = textarea.value;
         if (!text) return;
