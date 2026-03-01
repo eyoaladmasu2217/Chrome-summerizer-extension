@@ -181,8 +181,11 @@ const initEventListeners = () => {
 
     const emailBtn = document.getElementById('email-btn');
 
-    summarizeBtn.addEventListener('click', handleSummarize);
-    regenerateBtn.addEventListener('click', handleSummarize);
+    const eli5Btn = document.getElementById('eli5-btn');
+
+    summarizeBtn.addEventListener('click', () => handleSummarize());
+    regenerateBtn.addEventListener('click', () => handleSummarize());
+    eli5Btn.addEventListener('click', () => handleSummarize(true));
 
     emailBtn.addEventListener('click', () => {
         const text = textarea.value;
@@ -410,7 +413,7 @@ const updateStepStatus = (stepNumber, status) => {
     });
 };
 
-const handleSummarize = async () => {
+const handleSummarize = async (isEli5 = false) => {
     const summarizeBtn = document.getElementById('summarize-btn');
     const textarea = document.getElementById('summary');
     const readingTime = document.getElementById('reading-time');
@@ -444,7 +447,7 @@ const handleSummarize = async () => {
         readingTime.style.display = 'block';
 
         updateStepStatus(2, 'active');
-        const summary = await getSummary(pageData.text, pageData.links);
+        const summary = await getSummary(pageData.text, pageData.links, isEli5);
         updateStepStatus(2, 'completed');
         updateStats(minutes);
 
@@ -477,6 +480,7 @@ const handleSummarize = async () => {
         document.getElementById('word-count').textContent = `${summaryWordCount} words`;
         document.getElementById('count-container').style.display = 'flex';
         document.getElementById('regenerate-btn').style.display = 'flex';
+        document.getElementById('eli5-btn').style.display = 'flex';
         document.getElementById('chat-container').style.display = 'flex';
         document.getElementById('tts-controls').style.display = 'flex';
         chatHistory = []; // Reset chat history for new summary
@@ -601,7 +605,7 @@ const getPageData = (tabId) => {
 };
 
 
-const getSummary = async (text, links = []) => {
+const getSummary = async (text, links = [], isEli5 = false) => {
     const settings = await chrome.storage.sync.get(['summaryLength', 'summaryTone', 'outputLanguage', 'aiModel', 'apiKey']);
     const model = settings.aiModel || DEFAULT_MODEL;
     const length = settings.summaryLength || 'medium';
@@ -620,12 +624,15 @@ const getSummary = async (text, links = []) => {
         default: lengthInstruction = 'Provide a well-balanced summary of the main points.';
     }
 
-    let toneInstruction = '';
-    switch (tone) {
-        case 'casual': toneInstruction = 'Use a casual, friendly, and conversational tone.'; break;
-        case 'creative': toneInstruction = 'Use a creative, engaging, and enthusiastic tone.'; break;
-        case 'minimalist': toneInstruction = 'Be extremely brief and use ultra-minimalist language.'; break;
-        default: toneInstruction = 'Use a professional, academic, and informative tone.';
+    if (isEli5) {
+        toneInstruction = 'Explain this like I am 5 years old. Use very simple language, relatable analogies, and avoid any technical jargon.';
+    } else {
+        switch (tone) {
+            case 'casual': toneInstruction = 'Use a casual, friendly, and conversational tone.'; break;
+            case 'creative': toneInstruction = 'Use a creative, engaging, and enthusiastic tone.'; break;
+            case 'minimalist': toneInstruction = 'Be extremely brief and use ultra-minimalist language.'; break;
+            default: toneInstruction = 'Use a professional, academic, and informative tone.';
+        }
     }
 
     const payload = {
