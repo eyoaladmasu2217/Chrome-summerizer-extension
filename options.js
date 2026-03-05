@@ -3,6 +3,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = document.getElementById('status');
     const saveBtn = document.getElementById('save-btn');
 
+    // Tab switching
+    const settingsTab = document.getElementById('settings-tab');
+    const statsTab = document.getElementById('stats-tab');
+    const settingsSection = document.getElementById('settings-section');
+    const statsSection = document.getElementById('stats-section');
+
+    settingsTab.addEventListener('click', () => {
+        settingsTab.classList.add('active');
+        statsTab.classList.remove('active');
+        settingsSection.classList.add('active');
+        statsSection.classList.remove('active');
+        settingsTab.setAttribute('aria-selected', 'true');
+        statsTab.setAttribute('aria-selected', 'false');
+    });
+
+    statsTab.addEventListener('click', () => {
+        statsTab.classList.add('active');
+        settingsTab.classList.remove('active');
+        statsSection.classList.add('active');
+        settingsSection.classList.remove('active');
+        statsTab.setAttribute('aria-selected', 'true');
+        settingsTab.setAttribute('aria-selected', 'false');
+        loadStatistics();
+    });
+
     // Load saved settings
     chrome.storage.sync.get(['summaryLength', 'summaryTone', 'outputLanguage', 'aiModel', 'darkMode', 'autoCopy', 'apiKey'], (result) => {
         document.getElementById('summary-length').value = result.summaryLength || 'medium';
@@ -45,3 +70,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+const loadStatistics = () => {
+    chrome.storage.local.get(['summaries'], (result) => {
+        const summaries = result.summaries || [];
+        const totalSummaries = summaries.length;
+        const bookmarkedCount = summaries.filter(s => s.bookmarked).length;
+        const totalTime = summaries.reduce((sum, s) => sum + (s.readingTime || 0), 0);
+        const aiInteractions = summaries.length; // Assuming each summary is an AI interaction
+
+        document.getElementById('total-summaries').textContent = totalSummaries;
+        document.getElementById('total-time').textContent = `${totalTime}m`;
+        document.getElementById('bookmarked-count').textContent = bookmarkedCount;
+        document.getElementById('ai-interactions').textContent = aiInteractions;
+
+        // Recent activity
+        const recentActivity = document.getElementById('recent-activity');
+        recentActivity.innerHTML = '';
+        const recent = summaries.slice(0, 10);
+        recent.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'activity-item';
+            div.innerHTML = `
+                <span class="activity-title">${item.title || 'Untitled'}</span>
+                <span class="activity-date">${new Date(item.date).toLocaleDateString()}</span>
+            `;
+            recentActivity.appendChild(div);
+        });
+    });
+};

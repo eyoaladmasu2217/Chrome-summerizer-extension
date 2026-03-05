@@ -746,7 +746,8 @@ const handleSummarize = async (isEli5 = false) => {
             summary: summary,
             model: settings.aiModel || DEFAULT_MODEL,
             sentiment: sentiment,
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
+            readingTime: minutes
         };
 
         chrome.storage.local.get(['summaries'], (result) => {
