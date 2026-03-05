@@ -407,21 +407,46 @@ const initEventListeners = () => {
         }
     });
 
-    const exportAllHistory = () => {
+    const exportAllHistory = (format = 'txt') => {
         chrome.storage.local.get(['summaries'], (result) => {
             const summaries = result.summaries || [];
             if (summaries.length === 0) {
                 showToast('No history to export', 'error');
                 return;
             }
-            const exportData = summaries.map(s => 
-                `Title: ${s.title}\nURL: ${s.url}\nDate: ${new Date(s.timestamp).toLocaleString()}\n\n${s.summary}\n\n---\n\n`
-            ).join('');
-            const blob = new Blob([exportData], { type: 'text/plain' });
+
+            let content, mimeType, extension;
+            if (format === 'json') {
+                content = JSON.stringify(summaries, null, 2);
+                mimeType = 'application/json';
+                extension = 'json';
+            } else if (format === 'csv') {
+                const headers = ['Title', 'URL', 'Summary', 'Date', 'Model', 'Sentiment', 'Reading Time'];
+                const csvRows = summaries.map(s => [
+                    `"${(s.title || '').replace(/"/g, '""')}"`,
+                    s.url || '',
+                    `"${(s.summary || '').replace(/"/g, '""')}"`,
+                    s.date || '',
+                    s.model || '',
+                    s.sentiment || '',
+                    s.readingTime || 0
+                ]);
+                content = [headers, ...csvRows].map(row => row.join(',')).join('\n');
+                mimeType = 'text/csv';
+                extension = 'csv';
+            } else {
+                content = summaries.map(s => 
+                    `Title: ${s.title}\nURL: ${s.url}\nDate: ${new Date(s.date).toLocaleString()}\nModel: ${s.model}\nSentiment: ${s.sentiment}\nReading Time: ${s.readingTime || 0} min\n\n${s.summary}\n\n---\n\n`
+                ).join('');
+                mimeType = 'text/plain';
+                extension = 'txt';
+            }
+
+            const blob = new Blob([content], { type: mimeType });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `summaries-export-${Date.now()}.txt`;
+            a.download = `summaries-export-${Date.now()}.${extension}`;
             a.click();
             URL.revokeObjectURL(url);
             showToast('History exported successfully!');
@@ -483,6 +508,8 @@ const initEventListeners = () => {
     const quickSummarize = document.getElementById('quick-summarize');
     const quickCopy = document.getElementById('quick-copy');
     const quickExport = document.getElementById('quick-export');
+    const quickExportJson = document.getElementById('quick-export-json');
+    const quickExportCsv = document.getElementById('quick-export-csv');
     const quickClear = document.getElementById('quick-clear');
 
     const bookmarkBtn = document.getElementById('bookmark-btn');
@@ -518,7 +545,17 @@ const initEventListeners = () => {
 
     quickExport.addEventListener('click', () => {
         quickActionsMenu.style.display = 'none';
-        exportAllHistory();
+        exportAllHistory('txt');
+    });
+
+    quickExportJson.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        exportAllHistory('json');
+    });
+
+    quickExportCsv.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        exportAllHistory('csv');
     });
 
     quickClear.addEventListener('click', () => {
