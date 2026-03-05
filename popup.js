@@ -369,11 +369,88 @@ const initEventListeners = () => {
         }
     });
 
+    const exportAllHistory = () => {
+        chrome.storage.local.get(['summaries'], (result) => {
+            const summaries = result.summaries || [];
+            if (summaries.length === 0) {
+                showToast('No history to export', 'error');
+                return;
+            }
+            const exportData = summaries.map(s => 
+                `Title: ${s.title}\nURL: ${s.url}\nDate: ${new Date(s.timestamp).toLocaleString()}\n\n${s.summary}\n\n---\n\n`
+            ).join('');
+            const blob = new Blob([exportData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `summaries-export-${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('History exported successfully!');
+        });
+    };
+
+    const clearAllHistory = () => {
+        chrome.storage.local.set({ summaries: [] }, () => {
+            loadHistory();
+            showToast('History cleared');
+        });
+    };
+
     settingsTrigger.addEventListener('click', () => {
         if (chrome.runtime.openOptionsPage) {
             chrome.runtime.openOptionsPage();
         } else {
             window.open(chrome.runtime.getURL('options.html'));
+        }
+    });
+
+    // Quick Actions Menu
+    const quickActionsBtn = document.getElementById('quick-actions-btn');
+    const quickActionsMenu = document.getElementById('quick-actions-menu');
+    const quickSummarize = document.getElementById('quick-summarize');
+    const quickCopy = document.getElementById('quick-copy');
+    const quickExport = document.getElementById('quick-export');
+    const quickClear = document.getElementById('quick-clear');
+
+    quickActionsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = quickActionsMenu.style.display !== 'none';
+        quickActionsMenu.style.display = isVisible ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!quickActionsBtn.contains(e.target) && !quickActionsMenu.contains(e.target)) {
+            quickActionsMenu.style.display = 'none';
+        }
+    });
+
+    quickSummarize.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        handleSummarize();
+    });
+
+    quickCopy.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        const summary = document.getElementById('summary').value;
+        if (summary) {
+            navigator.clipboard.writeText(summary).then(() => {
+                showToast('Summary copied to clipboard!');
+            });
+        } else {
+            showToast('No summary to copy', 'error');
+        }
+    });
+
+    quickExport.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        exportAllHistory();
+    });
+
+    quickClear.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        if (confirm('Are you sure you want to clear all history?')) {
+            clearAllHistory();
         }
     });
 
