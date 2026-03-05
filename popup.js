@@ -29,7 +29,7 @@ let currentSummary = '';
 let chatHistory = [];
 let synth = window.speechSynthesis;
 let isReading = false;
-let showFavoritesOnly = false;
+let showBookmarksOnly = false;
 
 const getRelativeTime = (timestamp) => {
     const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
@@ -344,12 +344,12 @@ const initEventListeners = () => {
         clearSearchBtn.style.display = query ? 'flex' : 'none';
     });
 
-    const filterFavBtn = document.getElementById('filter-fav-btn');
+    const filterBookmarkBtn = document.getElementById('filter-bookmark-btn');
 
-    filterFavBtn.addEventListener('click', () => {
-        showFavoritesOnly = !showFavoritesOnly;
-        filterFavBtn.classList.toggle('active');
-        filterFavBtn.querySelector('i').textContent = showFavoritesOnly ? 'star' : 'star_outline';
+    filterBookmarkBtn.addEventListener('click', () => {
+        showBookmarksOnly = !showBookmarksOnly;
+        filterBookmarkBtn.classList.toggle('active');
+        filterBookmarkBtn.querySelector('i').textContent = showBookmarksOnly ? 'bookmark' : 'bookmark_border';
         loadHistory(historySearch.value);
     });
 
@@ -397,6 +397,40 @@ const initEventListeners = () => {
         });
     };
 
+    const bookmarkSummary = async (summary) => {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const settings = await chrome.storage.sync.get(['aiModel']);
+        const model = settings.aiModel || DEFAULT_MODEL;
+        const bookmark = {
+            id: Date.now().toString(),
+            title: tab?.title || 'Bookmarked Summary',
+            url: tab?.url || '',
+            summary: summary,
+            date: Date.now(),
+            model: model,
+            bookmarked: true
+        };
+
+        chrome.storage.local.get(['summaries'], (result) => {
+            const summaries = result.summaries || [];
+            summaries.unshift(bookmark);
+            // Keep only last 50 summaries
+            if (summaries.length > 50) summaries.splice(50);
+            chrome.storage.local.set({ summaries }, () => {
+                showToast('Summary bookmarked!');
+                updateBookmarkIcon(true);
+                loadHistory(); // Refresh history to show the bookmark
+            });
+        });
+    };
+
+    const updateBookmarkIcon = (isBookmarked) => {
+        const icon = bookmarkBtn.querySelector('i');
+        if (icon) {
+            icon.textContent = isBookmarked ? 'bookmark' : 'bookmark_border';
+        }
+    };
+
     settingsTrigger.addEventListener('click', () => {
         if (chrome.runtime.openOptionsPage) {
             chrome.runtime.openOptionsPage();
@@ -412,6 +446,8 @@ const initEventListeners = () => {
     const quickCopy = document.getElementById('quick-copy');
     const quickExport = document.getElementById('quick-export');
     const quickClear = document.getElementById('quick-clear');
+
+    const bookmarkBtn = document.getElementById('bookmark-btn');
 
     quickActionsBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -452,6 +488,15 @@ const initEventListeners = () => {
         if (confirm('Are you sure you want to clear all history?')) {
             clearAllHistory();
         }
+    });
+
+    bookmarkBtn.addEventListener('click', () => {
+        const summary = document.getElementById('summary').value;
+        if (!summary) {
+            showToast('No summary to bookmark', 'error');
+            return;
+        }
+        bookmarkSummary(summary);
     });
 
     // Keyboard Shortcuts
@@ -876,15 +921,15 @@ const loadHistory = (searchQuery = '') => {
             );
         }
 
-        if (showFavoritesOnly) {
-            summaries = summaries.filter(item => item.favorite);
+        if (showBookmarksOnly) {
+            summaries = summaries.filter(item => item.bookmarked);
         }
 
         historyList.innerHTML = summaries.length === 0 ?
             `<div class="empty-state">
-                <i class="material-icons-round">${showFavoritesOnly ? 'star_outline' : 'history_toggle_off'}</i>
-                <p>${showFavoritesOnly ? 'No favorite summaries yet.' : (searchQuery ? 'No summaries match your search.' : 'Your summary history will appear here.')}</p>
-                ${(searchQuery || showFavoritesOnly) ? '' : '<p class="sub-text">Generate your first summary to get started!</p>'}
+                <i class="material-icons-round">${showBookmarksOnly ? 'bookmark_border' : 'history_toggle_off'}</i>
+                <p>${showBookmarksOnly ? 'No bookmarked summaries yet.' : (searchQuery ? 'No summaries match your search.' : 'Your summary history will appear here.')}</p>
+                ${(searchQuery || showBookmarksOnly) ? '' : '<p class="sub-text">Generate your first summary to get started!</p>'}
             </div>` : '';
 
         summaries.forEach(item => {
@@ -967,14 +1012,14 @@ const loadHistory = (searchQuery = '') => {
             copyUrlBtn.innerHTML = '<i class="material-icons-round" style="font-size: 14px;">link</i>';
             copyUrlBtn.title = 'Copy Source URL';
 
-            const favoriteBtn = document.createElement('button');
-            favoriteBtn.className = `favorite-btn ${item.favorite ? 'active' : ''}`;
-            favoriteBtn.dataset.id = item.id;
-            favoriteBtn.innerHTML = `<i class="material-icons-round" style="font-size: 14px;">${item.favorite ? 'star' : 'star_outline'}</i>`;
-            favoriteBtn.title = item.favorite ? 'Unfavorite' : 'Favorite';
+            const bookmarkBtn = document.createElement('button');
+            bookmarkBtn.className = `bookmark-btn ${item.bookmarked ? 'active' : ''}`;
+            bookmarkBtn.dataset.id = item.id;
+            bookmarkBtn.innerHTML = `<i class="material-icons-round" style="font-size: 14px;">${item.bookmarked ? 'bookmark' : 'bookmark_border'}</i>`;
+            bookmarkBtn.title = item.bookmarked ? 'Remove bookmark' : 'Bookmark';
 
             actions.appendChild(viewBtn);
-            actions.appendChild(favoriteBtn);
+            actions.appendChild(bookmarkBtn);
             actions.appendChild(copyHistoryBtn);
             actions.appendChild(copyUrlBtn);
             actions.appendChild(deleteBtn);
@@ -1018,10 +1063,10 @@ const loadHistory = (searchQuery = '') => {
             } else if (btn.classList.contains('delete-btn')) {
                 const updated = summaries.filter(s => s.id !== id);
                 chrome.storage.local.set({ summaries: updated }, loadHistory);
-            } else if (btn.classList.contains('favorite-btn')) {
+            } else if (btn.classList.contains('bookmark-btn')) {
                 const updated = summaries.map(s => {
                     if (s.id === id) {
-                        return { ...s, favorite: !s.favorite };
+                        return { ...s, bookmarked: !s.bookmarked };
                     }
                     return s;
                 });

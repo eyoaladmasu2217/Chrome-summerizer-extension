@@ -581,17 +581,17 @@ textarea#summary::placeholder {
     color: white;
 }
 
-.favorite-btn {
+.bookmark-btn {
     background: var(--glass-highlight);
     color: var(--text-muted);
 }
 
-.favorite-btn:hover {
+.bookmark-btn:hover {
     background: rgba(255, 193, 7, 0.1);
     color: #ffc107;
 }
 
-.favorite-btn.active {
+.bookmark-btn.active {
     color: #ffc107;
 }
 
