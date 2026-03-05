@@ -512,6 +512,13 @@ const initEventListeners = () => {
             const isVisible = quickActionsMenu.style.display !== 'none';
             quickActionsMenu.style.display = isVisible ? 'none' : 'block';
         }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+            e.preventDefault();
+            const summary = document.getElementById('summary').value;
+            if (summary) {
+                bookmarkSummary(summary);
+            }
+        }
     });
 
     copyBtn.addEventListener('click', () => {
