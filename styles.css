@@ -1563,6 +1563,13 @@ body.reading-mode #exit-reading-mode {
     color: var(--text-main);
 }
 
+.stats-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
 .activity-list {
     max-height: 300px;
     overflow-y: auto;

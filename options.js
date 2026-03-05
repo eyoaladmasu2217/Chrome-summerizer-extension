@@ -28,6 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
         loadStatistics();
     });
 
+    // Reset stats button
+    const resetStatsBtn = document.getElementById('reset-stats-btn');
+    resetStatsBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset all statistics? This will clear your summary history.')) {
+            chrome.storage.local.set({ summaries: [] }, () => {
+                loadStatistics();
+                status.innerHTML = '<i class="material-icons-round" style="vertical-align: bottom; font-size: 16px;">check_circle</i> Statistics reset successfully!';
+                setTimeout(() => status.innerHTML = '', 2000);
+            });
+        }
+    });
+
     // Load saved settings
     chrome.storage.sync.get(['summaryLength', 'summaryTone', 'outputLanguage', 'aiModel', 'darkMode', 'autoCopy', 'apiKey'], (result) => {
         document.getElementById('summary-length').value = result.summaryLength || 'medium';
