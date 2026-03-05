@@ -462,6 +462,11 @@ const initEventListeners = () => {
                 handleSummarize();
             }
         }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'q') {
+            e.preventDefault();
+            const isVisible = quickActionsMenu.style.display !== 'none';
+            quickActionsMenu.style.display = isVisible ? 'none' : 'block';
+        }
     });
 
     copyBtn.addEventListener('click', () => {
