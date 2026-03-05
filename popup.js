@@ -185,6 +185,8 @@ const initEventListeners = () => {
     const clearHistoryBtn = document.getElementById('clear-history-btn');
     const regenerateBtn = document.getElementById('regenerate-btn');
     const markdownBtn = document.getElementById('markdown-btn');
+    const jsonBtn = document.getElementById('json-btn');
+    const csvBtn = document.getElementById('csv-btn');
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const copyAllLinksBtn = document.getElementById('copy-all-links');
     const chatInput = document.getElementById('chat-input');
@@ -325,6 +327,42 @@ const initEventListeners = () => {
         a.click();
         URL.revokeObjectURL(url);
         showToast('Markdown file exported');
+    });
+
+    jsonBtn.addEventListener('click', async () => {
+        const text = textarea.value;
+        if (!text) return;
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const data = {
+            title: tab?.title || 'Summary',
+            url: tab?.url || '',
+            summary: text,
+            timestamp: new Date().toISOString(),
+            wordCount: text.split(/\s+/).length
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `summary-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('JSON file exported');
+    });
+
+    csvBtn.addEventListener('click', async () => {
+        const text = textarea.value;
+        if (!text) return;
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const csv = `Title,URL,Summary,Timestamp,Word Count\n"${(tab?.title || 'Summary').replace(/"/g, '""')}",${tab?.url || ''},"${text.replace(/"/g, '""')}",${new Date().toISOString()},${text.split(/\s+/).length}`;
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `summary-${Date.now()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('CSV file exported');
     });
 
     copyAllLinksBtn.addEventListener('click', () => {
