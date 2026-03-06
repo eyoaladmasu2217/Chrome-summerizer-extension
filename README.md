@@ -98,6 +98,13 @@ Tailor the extension to your specific needs via the **Options Dashboard**:
 
 ---
 
+## 🧱 Development & Contribution
+
+We follow consistent code style and quality checks throughout the repository.  
+- **ESLint** is configured via `.eslintrc.json`; simply run `npx eslint "**/*.js"` to lint JavaScript files.  
+- A GitHub Action (`.github/workflows/lint.yml`) automatically lints new commits on `main`.  
+- Please open pull requests if you'd like to propose changes; small, atomic commits make the review process easier.  
+
 ## 🚀 Quick Setup
 
 1. **Clone the repository**: `git clone https://github.com/eyoaladmasu2217/Chrome-summerizer-extension.git`
