@@ -1,3 +1,8 @@
+"use strict";
+
+import { storageGet, storageSet } from './src/utils.js';
+
+// entry point
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('settings-form');
     const status = document.getElementById('status');
@@ -41,20 +46,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Load saved settings
-    chrome.storage.sync.get(['summaryLength', 'summaryTone', 'outputLanguage', 'aiModel', 'darkMode', 'autoCopy', 'apiKey'], (result) => {
-        document.getElementById('summary-length').value = result.summaryLength || 'medium';
-        document.getElementById('summary-tone').value = result.summaryTone || 'professional';
-        document.getElementById('output-language').value = result.outputLanguage || 'en';
-        document.getElementById('ai-model').value = result.aiModel || 'Summerizer';
-        document.getElementById('api-key').value = result.apiKey || '';
-        document.getElementById('dark-mode').checked = result.darkMode !== false; // Default to true
-        document.getElementById('auto-copy').checked = result.autoCopy || false;
+    (async () => {
+        try {
+            const result = await storageGet([
+                'summaryLength',
+                'summaryTone',
+                'outputLanguage',
+                'aiModel',
+                'darkMode',
+                'autoCopy',
+                'apiKey'
+            ]);
+            document.getElementById('summary-length').value = result.summaryLength || 'medium';
+            document.getElementById('summary-tone').value = result.summaryTone || 'professional';
+            document.getElementById('output-language').value = result.outputLanguage || 'en';
+            document.getElementById('ai-model').value = result.aiModel || 'Summerizer';
+            document.getElementById('api-key').value = result.apiKey || '';
+            document.getElementById('dark-mode').checked = result.darkMode !== false; // Default true
+            document.getElementById('auto-copy').checked = result.autoCopy || false;
 
-        // Apply dark mode immediately
-        document.body.classList.toggle('light-mode', result.darkMode === false);
-    });
+            // Apply dark mode immediately
+            document.body.classList.toggle('light-mode', result.darkMode === false);
+        } catch (e) {
+            Logger.error('Unable to load saved settings', e);
+        }
+    })();
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<i class="material-icons-round">sync</i> Saving...';
@@ -69,17 +87,20 @@ document.addEventListener('DOMContentLoaded', () => {
             autoCopy: document.getElementById('auto-copy').checked
         };
 
-        chrome.storage.sync.set(settings, () => {
+        try {
+            await storageSet(settings);
             document.body.classList.toggle('light-mode', !settings.darkMode);
-
             status.innerHTML = '<i class="material-icons-round" style="vertical-align: bottom; font-size: 16px;">check_circle</i> Settings applied successfully!';
-
+        } catch (err) {
+            Logger.error('Unable to save options', err);
+            status.textContent = 'Error saving settings';
+        } finally {
             setTimeout(() => {
                 status.innerHTML = '';
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '<i class="material-icons-round">save</i> Save Configuration';
             }, 2000);
-        });
+        }
     });
 });
 
