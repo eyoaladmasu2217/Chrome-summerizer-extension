@@ -1,3 +1,9 @@
+/*
+ * styles.css
+ * Main stylesheet for the extension popup and options pages.
+ * Uses CSS custom properties for theming and glassmorphism effects.
+ */
+
 /* Global Variables & Tokens */
 :root {
     --primary: #6366f1;
