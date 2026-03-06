@@ -1,0 +1,22 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "chrome": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-var": "error",
+    "prefer-const": "warn",
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "semi": ["error", "always"],
+    "eqeqeq": "error",
+    "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
+    "indent": ["error", 4],
+    "no-unused-vars": ["warn", { "args": "none", "vars": "local" }]
+  }
+}
