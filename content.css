@@ -1,4 +1,8 @@
-/* content.css - Styles specifically for the selection overlay injected into web pages */
+/*
+ * content.css
+ * Styles specifically for the selection overlay injected into web pages.
+ * Organized variables at the top, followed by scoped component rules.
+ */
 
 :root {
     --primary: #6366f1;
