@@ -1,11 +1,22 @@
-const DEFAULT_MODEL = 'Summerizer';
+"use strict";
+
+// module imports
+import {
+    storageGet,
+    storageSet,
+    showToast,
+    triggerHaptic,
+    updateThemeIcon,
+    getRelativeTime
+} from './src/utils.js';
+import { DEFAULT_MODEL, STORAGE_KEYS } from './src/constants.js';
 
 /**
- * Professional Logging System
- * Handles application logs with consistent formatting and toggleable debug mode
+ * Professional logging system for debugging purposes. Toggle isDebug to
+ * suppress console output in production.
  */
 class Logger {
-    static isDebug = true; // Can be linked to a setting if needed
+    static isDebug = true; // link this to a setting if you like
 
     static log(message, ...args) {
         if (this.isDebug) console.log(`[SummarizeAI][LOG] ${message}`, ...args);
@@ -31,18 +42,6 @@ let synth = window.speechSynthesis;
 let isReading = false;
 let showBookmarksOnly = false;
 
-const getRelativeTime = (timestamp) => {
-    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-    const diff = Date.now() - new Date(timestamp).getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return rtf.format(-minutes, 'minute');
-    if (hours < 24) return rtf.format(-hours, 'hour');
-    return rtf.format(-days, 'day');
-};
 
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -55,27 +54,38 @@ window.addEventListener('DOMContentLoaded', () => {
     checkApiKey();
 });
 
-const checkApiKey = () => {
-    chrome.storage.sync.get(['apiKey'], (result) => {
+const checkApiKey = async () => {
+    try {
+        const result = await storageGet([STORAGE_KEYS.API_KEY]);
         const warning = document.getElementById('api-key-warning');
         if (!result.apiKey) {
             warning.style.display = 'flex';
         } else {
             warning.style.display = 'none';
         }
-    });
+    } catch (err) {
+        Logger.error('Failed to check API key', err);
+    }
 };
 
-const loadStats = () => {
-    chrome.storage.local.get(['stats'], (result) => {
+const loadStats = async () => {
+    try {
+        const result = await new Promise(resolve => {
+            chrome.storage.local.get(['stats'], resolve);
+        });
         const stats = result.stats || { count: 0, timeSaved: 0 };
         document.getElementById('stat-count').textContent = stats.count;
         document.getElementById('stat-time').textContent = `${stats.timeSaved}m`;
-    });
+    } catch (err) {
+        Logger.error('Error loading stats', err);
+    }
 };
 
-const updateStats = (minutesSaved) => {
-    chrome.storage.local.get(['stats'], (result) => {
+const updateStats = async (minutesSaved) => {
+    try {
+        const result = await new Promise(resolve => {
+            chrome.storage.local.get(['stats'], resolve);
+        });
         const stats = result.stats || { count: 0, timeSaved: 0 };
         stats.count += 1;
         stats.timeSaved += minutesSaved;
@@ -83,24 +93,11 @@ const updateStats = (minutesSaved) => {
             document.getElementById('stat-count').textContent = stats.count;
             document.getElementById('stat-time').textContent = `${stats.timeSaved}m`;
         });
-    });
+    } catch (err) {
+        Logger.error('Error updating stats', err);
+    }
 };
 
-const showToast = (message, type = 'success') => {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-
-    const icon = type === 'success' ? 'check_circle' : 'error';
-    toast.innerHTML = `<i class="material-icons-round">${icon}</i><span>${message}</span>`;
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-};
 
 /**
  * Visual Haptic Feedback
@@ -117,15 +114,19 @@ const initSettings = () => {
     const themeToggle = document.getElementById('theme-toggle');
     const autocopyChip = document.getElementById('autocopy-chip');
 
-    chrome.storage.sync.get(['darkMode', 'autoCopy'], (result) => {
-        const darkMode = result.darkMode !== false; // Default to dark mode
-        document.body.classList.toggle('light-mode', !darkMode);
-        updateThemeIcon(darkMode);
-
-        if (result.autoCopy && autocopyChip) {
-            autocopyChip.style.display = 'flex';
+    (async () => {
+        try {
+            const result = await storageGet([STORAGE_KEYS.DARK_MODE, STORAGE_KEYS.AUTO_COPY]);
+            const darkMode = result.darkMode !== false; // default dark
+            document.body.classList.toggle('light-mode', !darkMode);
+            updateThemeIcon(darkMode);
+            if (result.autoCopy && autocopyChip) {
+                autocopyChip.style.display = 'flex';
+            }
+        } catch (e) {
+            Logger.error('Failed to load initial settings', e);
         }
-    });
+    })();
 
     themeToggle.addEventListener('click', () => {
         const isCurrentlyLight = document.body.classList.contains('light-mode');
