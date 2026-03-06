@@ -1,11 +1,30 @@
-// AIML_API_KEY removed for security. Now retrieved from storage.
-const DEFAULT_MODEL = 'Summerizer';
+(function() {
+    'use strict';
 
-let overlay = null;
-let currentSelectedText = '';
+    // constants
+    const DEFAULT_MODEL = 'Summerizer';
+    const MIN_SELECTION_LEN = 50;
+    const OVERLAY_ID = 'summary-overlay';
 
+    // state
+    let overlay = null;
+    let currentSelectedText = '';
+
+    /**
+     * simple promisified wrapper over chrome.storage.sync.get
+     * @param {string|string[]} keys
+     */
+    const storageGet = (keys) => new Promise(resolve => chrome.storage.sync.get(keys, resolve));
+
+
+/**
+ * Request a summary for a given text snippet from the external AI API.
+ * @param {string} text - selected text from the page
+ * @returns {Promise<string>} AI-generated summary
+ * @throws Will throw an error if the API key is missing or network fails.
+ */
 const getSelectionSummary = async (text) => {
-    const settings = await chrome.storage.sync.get(['summaryLength', 'outputLanguage', 'aiModel', 'apiKey']);
+    const settings = await storageGet(['summaryLength', 'outputLanguage', 'aiModel', 'apiKey']);
     const model = settings.aiModel || DEFAULT_MODEL;
     const length = settings.summaryLength || 'short';
     const language = settings.outputLanguage || 'en';
@@ -50,10 +69,12 @@ const createSummaryOverlay = () => {
     overlay.id = 'summary-overlay';
 
     // Load dark mode
-    chrome.storage.sync.get(['darkMode'], (result) => {
+    storageGet(['darkMode']).then(result => {
         if (result.darkMode === false) {
             overlay.classList.add('light-mode');
         }
+    }).catch(err => {
+        console.error('Failed to read darkMode', err);
     });
 
     // Inject Material Icons if not present
@@ -103,7 +124,7 @@ const showOverlay = (x, y) => {
     overlay.style.position = 'absolute';
     overlay.style.top = `${y}px`;
     overlay.style.left = `${x}px`;
-    overlay.style.zIndex = '2147483647';
+    overlay.style.zIndex = OVERLAY_Z_INDEX;
 };
 
 const hideOverlay = () => {
@@ -165,7 +186,7 @@ document.addEventListener('mouseup', (e) => {
     const selection = window.getSelection();
     const selectedText = selection.toString().trim();
 
-    if (selectedText.length > 50) {
+    if (selectedText.length > MIN_SELECTION_LEN) {
         currentSelectedText = selectedText;
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
@@ -174,3 +195,6 @@ document.addEventListener('mouseup', (e) => {
         hideOverlay();
     }
 });
+
+})();
+
