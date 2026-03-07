@@ -423,27 +423,61 @@ h1 {
 /* Output Area */
 .summary-field {
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: var(--border-radius-xl);
     border: 1px solid var(--glass-border);
-    padding: 16px;
+    padding: 20px;
     margin-bottom: 20px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-field::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.summary-field:hover {
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.summary-field:hover::before {
+    opacity: 1;
 }
 
 textarea#summary {
     width: 100%;
-    height: 180px;
+    height: 200px;
     background: transparent;
     border: none;
     color: var(--text-main);
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.6;
     resize: none;
     outline: none;
+    font-family: inherit;
+    padding: 0;
+    margin: 0;
 }
 
 textarea#summary::placeholder {
     color: var(--text-muted);
+    font-style: italic;
+}
+
+textarea#summary:focus {
+    outline: none;
 }
 
 /* Links Section */
