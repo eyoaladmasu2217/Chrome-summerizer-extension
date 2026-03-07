@@ -914,35 +914,56 @@ textarea#summary:focus {
 
 .icon-btn {
     background: transparent;
-    border: none;
+    border: 1px solid var(--glass-border);
     color: var(--text-muted);
     cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.2s;
+    padding: 10px;
+    border-radius: var(--border-radius-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.icon-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--glass-highlight-hover), transparent);
+    transition: left 0.4s;
+}
+
+.icon-btn:hover::before {
+    left: 100%;
 }
 
 .icon-btn:hover {
-    background: var(--glass-border);
+    background: var(--glass-highlight-hover);
+    border-color: var(--glass-border-hover);
     color: var(--text-main);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .fab {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    background: var(--primary) !important;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white !important;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(99, 102, 241, 0.3);
+    border: 1px solid transparent;
     z-index: 100;
 }
 
 .fab:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--shadow-xl), 0 0 30px rgba(99, 102, 241, 0.4);
 }
 
 /* Toast Notifications */
