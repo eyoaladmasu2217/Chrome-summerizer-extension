@@ -1599,6 +1599,105 @@ body.reading-mode textarea#summary {
     font-size: 16px;
 }
 
+/* Responsive Design */
+@media (max-width: 400px) {
+    .extension-popup {
+        padding: 16px;
+    }
+
+    .header {
+        padding: 12px 16px;
+        margin-bottom: 16px;
+    }
+
+    h1 {
+        font-size: 18px;
+    }
+
+    .tabs {
+        padding: 4px;
+        margin-bottom: 16px;
+    }
+
+    .tab-button {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .stats-bar {
+        padding: 12px 8px;
+        margin-bottom: 16px;
+    }
+
+    .stat span {
+        font-size: 16px;
+    }
+
+    .summary-field {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    textarea#summary {
+        height: 160px;
+        font-size: 14px;
+    }
+
+    .main-actions {
+        gap: 12px;
+    }
+
+    .buttons {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    .export-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .export-grid .buttons {
+        padding: 10px 6px;
+        font-size: 12px;
+        min-height: 44px;
+    }
+
+    .history-item {
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+
+    .history-header h4 {
+        font-size: 15px;
+    }
+
+    .history-preview {
+        font-size: 13px;
+    }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --glass-highlight: rgba(255, 255, 255, 0.15);
+        --text-main: #ffffff;
+        --text-muted: #cccccc;
+    }
+}
+
 #exit-reading-mode {
     display: none;
     position: fixed;
