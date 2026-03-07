@@ -102,21 +102,35 @@ body {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 24px;
+    padding: 16px 20px;
+    background: var(--card-bg);
+    border-radius: var(--border-radius-xl);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.header:hover {
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--shadow-md);
 }
 
 .logo-area {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 h1 {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
-    background: linear-gradient(to right, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    margin: 0;
+    letter-spacing: -0.02em;
 }
 
 
