@@ -980,38 +980,55 @@ textarea#summary:focus {
 }
 
 .toast {
-    background: rgba(15, 23, 42, 0.95);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 12px;
-    font-size: 13px;
+    background: var(--card-bg);
+    color: var(--text-main);
+    padding: 14px 20px;
+    border-radius: var(--border-radius-lg);
+    font-size: 14px;
     font-weight: 500;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-xl), 0 0 30px rgba(0, 0, 0, 0.3);
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
     display: flex;
     align-items: center;
-    gap: 10px;
-    animation: toastIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    gap: 12px;
+    animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     pointer-events: auto;
+    max-width: 320px;
+    word-wrap: break-word;
 }
 
-.toast.error {
-    border-color: rgba(239, 68, 68, 0.3);
-}
-
-.toast.error i {
-    color: var(--error);
+.toast.success {
+    border-color: var(--success-light);
+    background: linear-gradient(135deg, var(--card-bg), var(--success-light));
 }
 
 .toast.success i {
     color: var(--success);
 }
 
+.toast.error {
+    border-color: var(--error-light);
+    background: linear-gradient(135deg, var(--card-bg), var(--error-light));
+}
+
+.toast.error i {
+    color: var(--error);
+}
+
+.toast.warning {
+    border-color: var(--warning-light);
+    background: linear-gradient(135deg, var(--card-bg), var(--warning-light));
+}
+
+.toast.warning i {
+    color: var(--warning);
+}
+
 @keyframes toastIn {
     from {
         opacity: 0;
-        transform: translateY(20px) scale(0.9);
+        transform: translateY(30px) scale(0.9);
     }
 
     to {
@@ -1027,7 +1044,7 @@ textarea#summary:focus {
 @keyframes toastOut {
     to {
         opacity: 0;
-        transform: translateY(-10px) scale(0.95);
+        transform: translateY(-20px) scale(0.95);
     }
 }
 
