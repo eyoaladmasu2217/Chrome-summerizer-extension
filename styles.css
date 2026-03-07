@@ -40,11 +40,17 @@
 }
 
 body.light-mode {
-    --bg-dark: #f1f5f9;
-    --card-bg: rgba(255, 255, 255, 0.8);
+    --bg-dark: #f8fafc;
+    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --card-bg-hover: rgba(255, 255, 255, 0.95);
     --text-main: #1e293b;
     --text-muted: #64748b;
-    --glass-border: rgba(0, 0, 0, 0.05);
+    --text-subtle: #94a3b8;
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-border-hover: rgba(0, 0, 0, 0.12);
+    --glass-highlight: rgba(0, 0, 0, 0.03);
+    --glass-highlight-hover: rgba(0, 0, 0, 0.06);
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
