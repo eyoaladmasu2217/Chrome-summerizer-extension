@@ -249,12 +249,20 @@ h1 {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    background: var(--glass-highlight);
+    background: var(--card-bg);
     border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 10px;
+    border-radius: var(--border-radius-lg);
+    padding: 16px 12px;
     margin-bottom: 20px;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.stats-bar:hover {
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
 }
 
 .stat {
@@ -262,26 +270,37 @@ h1 {
     flex-direction: column;
     align-items: center;
     flex: 1;
+    padding: 8px;
+    border-radius: var(--border-radius-md);
+    transition: all 0.3s ease;
+}
+
+.stat:hover {
+    background: var(--glass-highlight-hover);
 }
 
 .stat span {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--primary);
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
 }
 
 .stat label {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     text-transform: uppercase;
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    text-align: center;
 }
 
 .stat-divider {
     width: 1px;
-    height: 20px;
-    background: var(--glass-border);
+    height: 24px;
+    background: linear-gradient(to bottom, transparent, var(--glass-border), transparent);
+    margin: 0 8px;
 }
 
 #reading-time {
