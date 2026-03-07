@@ -23,11 +23,11 @@
             width: 100%;
             max-width: 550px;
             background: var(--card-bg);
-            border-radius: 24px;
+            border-radius: var(--border-radius-2xl);
             border: 1px solid var(--glass-border);
             padding: 40px;
             backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--shadow-xl), 0 0 40px rgba(0, 0, 0, 0.3);
         }
 
         .setting-group {
@@ -47,18 +47,22 @@
         select,
         input[type="text"] {
             width: 100%;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 14px 16px;
+            border-radius: var(--border-radius-lg);
             border: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--card-bg);
             color: var(--text-main);
-            font-size: 14px;
+            font-size: 15px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.3s ease;
+            font-family: inherit;
         }
 
-        select:focus {
+        select:focus,
+        input[type="text"]:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+            background: var(--card-bg-hover);
         }
 
         .checkbox-group {
@@ -72,6 +76,19 @@
             width: 20px;
             height: 20px;
             accent-color: var(--primary);
+        }
+
+        #save-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: var(--shadow-md), 0 0 20px rgba(99, 102, 241, 0.3);
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        #save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 102, 241, 0.4);
         }
 
         #status {
