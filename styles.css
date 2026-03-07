@@ -542,13 +542,13 @@ textarea#summary:focus {
 .main-actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
 }
 
 .buttons {
     width: 100%;
-    padding: 12px;
-    border-radius: 12px;
+    padding: 14px 16px;
+    border-radius: var(--border-radius-lg);
     border: none;
     font-weight: 600;
     font-size: 15px;
@@ -557,48 +557,79 @@ textarea#summary:focus {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    text-transform: none;
+    letter-spacing: 0.02em;
+}
+
+.buttons::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.buttons:hover::before {
+    left: 100%;
 }
 
 #summarize-btn {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    box-shadow: var(--shadow-md), 0 0 20px rgba(99, 102, 241, 0.3);
+    border: 1px solid transparent;
 }
 
-#summarize-btn:hover {
+#summarize-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 102, 241, 0.4);
 }
 
-#summarize-btn:active {
+#summarize-btn:active:not(:disabled) {
     transform: translateY(0);
+    box-shadow: var(--shadow-md), 0 0 20px rgba(99, 102, 241, 0.3);
 }
 
 #summarize-btn:disabled {
-    background: var(--text-muted);
-    cursor: default;
+    background: linear-gradient(135deg, var(--text-muted), var(--text-subtle));
+    cursor: not-allowed;
     transform: none;
     box-shadow: none;
+    opacity: 0.6;
 }
 
 .export-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
     gap: 8px;
 }
 
 .export-grid .buttons {
-    flex: 1 1 calc(33% - 8px);
     background: var(--card-bg);
     color: var(--text-main);
     border: 1px solid var(--glass-border);
-    font-size: 12px;
-    padding: 10px 4px;
+    font-size: 13px;
+    padding: 12px 8px;
+    min-height: 48px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
 }
 
 .export-grid .buttons:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--glass-highlight-hover);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.export-grid .buttons:active {
+    transform: translateY(0);
 }
 
 /* History */
