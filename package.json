@@ -1,6 +1,6 @@
 {
   "name": "chrome-summarizer-extension",
-  "version": "1.3.1",
+  "version": "1.3.3",
   "description": "AI-powered web content summarizer Chrome extension",
   "scripts": {
     "lint": "eslint \"**/*.js\"",
