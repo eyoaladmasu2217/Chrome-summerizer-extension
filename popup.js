@@ -1160,8 +1160,8 @@ const loadHistory = (searchQuery = '') => {
                 item.tags.forEach(t => {
                     const span = document.createElement('span');
                     span.className = 'tag-chip';
-                    span.textContent = t;
                     span.dataset.tag = t;
+                    span.innerHTML = `${t} <span class="tag-remove">&times;</span>`;
                     tagContainer.appendChild(span);
                 });
                 div.appendChild(tagContainer);
@@ -1212,7 +1212,27 @@ const loadHistory = (searchQuery = '') => {
 
         // Event delegation for history actions
         historyList.onclick = (e) => {
-            // tag click filtering / removal
+            // remove icon click
+            if (e.target.classList.contains('tag-remove')) {
+                const parentChip = e.target.closest('.tag-chip');
+                const tag = parentChip.dataset.tag;
+                const itemDiv = e.target.closest('.history-item');
+                const id = parseInt(itemDiv.dataset.id);
+                chrome.storage.local.get(['summaries'], (res) => {
+                    const summaries = res.summaries || [];
+                    const idx = summaries.findIndex(s => s.id === id);
+                    if (idx !== -1) {
+                        summaries[idx].tags = (summaries[idx].tags || []).filter(t => t !== tag);
+                        chrome.storage.local.set({ summaries }, () => {
+                            loadHistory(historySearch.value);
+                            showToast('Tag removed');
+                        });
+                    }
+                });
+                return;
+            }
+
+            // tag chip click itself
             if (e.target.classList.contains('tag-chip')) {
                 const tag = e.target.dataset.tag || e.target.textContent;
                 // double click to remove
