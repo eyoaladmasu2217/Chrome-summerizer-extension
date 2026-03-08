@@ -835,6 +835,22 @@ textarea#summary:focus {
     align-items: center;
     margin-bottom: 12px;
     gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.small-select {
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--glass-border);
+    background: var(--card-bg);
+    color: var(--text-main);
 }
 
 .search-box {

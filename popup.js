@@ -442,6 +442,15 @@ const initEventListeners = () => {
         historySearch.focus();
     });
 
+    const modelFilter = document.getElementById('filter-model');
+    const sentimentFilter = document.getElementById('filter-sentiment');
+    if (modelFilter) {
+        modelFilter.addEventListener('change', () => loadHistory(historySearch.value));
+    }
+    if (sentimentFilter) {
+        sentimentFilter.addEventListener('change', () => loadHistory(historySearch.value));
+    }
+
     clearHistoryBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all summarization history?')) {
             chrome.storage.local.set({ summaries: [] }, () => {
@@ -1073,9 +1082,20 @@ const loadHistory = (searchQuery = '') => {
     chrome.storage.local.get(['summaries'], (result) => {
         const historyList = document.getElementById('history-list');
         const badge = document.getElementById('history-badge');
+        const modelFilter = document.getElementById('filter-model');
+        const sentimentFilter = document.getElementById('filter-sentiment');
         let summaries = result.summaries || [];
 
         if (badge) badge.textContent = summaries.length;
+
+        // populate model dropdown options dynamically
+        if (modelFilter) {
+            const models = [...new Set(summaries.map(s => s.model || '').filter(Boolean))];
+            const current = modelFilter.value;
+            modelFilter.innerHTML = '<option value="">All models</option>' + models.map(m => `
+                <option value="${m}"${m === current ? ' selected' : ''}>${m}</option>
+            `).join('');
+        }
 
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
@@ -1088,6 +1108,16 @@ const loadHistory = (searchQuery = '') => {
 
         if (showBookmarksOnly) {
             summaries = summaries.filter(item => item.bookmarked);
+        }
+
+        // apply model filter
+        if (modelFilter && modelFilter.value) {
+            summaries = summaries.filter(item => item.model === modelFilter.value);
+        }
+        // apply sentiment filter
+        if (sentimentFilter && sentimentFilter.value) {
+            const val = sentimentFilter.value.toLowerCase();
+            summaries = summaries.filter(item => (item.sentiment || '').toLowerCase().includes(val));
         }
 
         historyList.innerHTML = summaries.length === 0 ?
