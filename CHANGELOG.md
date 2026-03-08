@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.3] - 2026-03-08
+
+### Added
+- Tagging system with manual labels, auto-generation, and filter-by-tag support.
+- Double-click or remove icon to delete tags from history entries.
+- Model and sentiment filters in history view.
+- Sorting toggle for history (newest/oldest).
+- Translate button to convert summaries into selected language.
+- Version display on options page.
+
+### Changed
+- Updated version to 1.3.3 and synchronized package/manifest versions.
+- Improved tag input focus styling.
+
 ## [1.3.1] - 2026-03-06
 
 ### Added
