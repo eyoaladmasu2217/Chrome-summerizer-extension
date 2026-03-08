@@ -904,6 +904,7 @@ const handleSummarize = async (isEli5 = false) => {
             date: new Date().toISOString(),
             readingTime: minutes
         };
+        if (tagInput) tagInput.value = ''; // clear tag field after saving
 
         chrome.storage.local.get(['summaries'], (result) => {
             const summaries = result.summaries || [];
@@ -1099,6 +1100,7 @@ const loadHistory = (searchQuery = '') => {
         summaries.forEach(item => {
             const div = document.createElement('div');
             div.className = 'history-item';
+            div.dataset.id = item.id;
 
             const header = document.createElement('div');
             header.className = 'history-header';
@@ -1159,6 +1161,7 @@ const loadHistory = (searchQuery = '') => {
                     const span = document.createElement('span');
                     span.className = 'tag-chip';
                     span.textContent = t;
+                    span.dataset.tag = t;
                     tagContainer.appendChild(span);
                 });
                 div.appendChild(tagContainer);
@@ -1209,9 +1212,27 @@ const loadHistory = (searchQuery = '') => {
 
         // Event delegation for history actions
         historyList.onclick = (e) => {
-            // tag click filtering
+            // tag click filtering / removal
             if (e.target.classList.contains('tag-chip')) {
-                const tag = e.target.textContent;
+                const tag = e.target.dataset.tag || e.target.textContent;
+                // double click to remove
+                if (e.detail === 2) {
+                    const itemDiv = e.target.closest('.history-item');
+                    const id = parseInt(itemDiv.dataset.id);
+                    chrome.storage.local.get(['summaries'], (res) => {
+                        const summaries = res.summaries || [];
+                        const idx = summaries.findIndex(s => s.id === id);
+                        if (idx !== -1) {
+                            summaries[idx].tags = (summaries[idx].tags || []).filter(t => t !== tag);
+                            chrome.storage.local.set({ summaries }, () => {
+                                loadHistory(historySearch.value);
+                                showToast('Tag removed');
+                            });
+                        }
+                    });
+                    return;
+                }
+
                 historySearch.value = tag;
                 loadHistory(tag);
                 clearSearchBtn.style.display = 'flex';
