@@ -451,6 +451,14 @@ const initEventListeners = () => {
         sentimentFilter.addEventListener('change', () => loadHistory(historySearch.value));
     }
 
+    const sortBtn = document.getElementById('sort-order-btn');
+    if (sortBtn) {
+        sortBtn.addEventListener('click', () => {
+            historySortDescending = !historySortDescending;
+            loadHistory(historySearch.value);
+        });
+    }
+
     clearHistoryBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all summarization history?')) {
             chrome.storage.local.set({ summaries: [] }, () => {
@@ -1078,13 +1086,19 @@ const getSummary = async (text, links = [], isEli5 = false) => {
 };
 
 
+let historySortDescending = true; // newest first by default
 const loadHistory = (searchQuery = '') => {
     chrome.storage.local.get(['summaries'], (result) => {
         const historyList = document.getElementById('history-list');
         const badge = document.getElementById('history-badge');
         const modelFilter = document.getElementById('filter-model');
         const sentimentFilter = document.getElementById('filter-sentiment');
+        const sortBtn = document.getElementById('sort-order-btn');
         let summaries = result.summaries || [];
+
+        if (sortBtn) {
+            sortBtn.textContent = historySortDescending ? 'Newest' : 'Oldest';
+        }
 
         if (badge) badge.textContent = summaries.length;
 
@@ -1119,6 +1133,12 @@ const loadHistory = (searchQuery = '') => {
             const val = sentimentFilter.value.toLowerCase();
             summaries = summaries.filter(item => (item.sentiment || '').toLowerCase().includes(val));
         }
+        // sort results
+        summaries.sort((a, b) => {
+            const ta = new Date(a.date).getTime();
+            const tb = new Date(b.date).getTime();
+            return historySortDescending ? tb - ta : ta - tb;
+        });
 
         historyList.innerHTML = summaries.length === 0 ?
             `<div class="empty-state">
