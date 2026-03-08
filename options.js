@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'aiModel',
                 'darkMode',
                 'autoCopy',
+                'autoTag',
                 'apiKey'
             ]);
             document.getElementById('summary-length').value = result.summaryLength || 'medium';
@@ -64,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('api-key').value = result.apiKey || '';
             document.getElementById('dark-mode').checked = result.darkMode !== false; // Default true
             document.getElementById('auto-copy').checked = result.autoCopy || false;
+            document.getElementById('auto-tag').checked = result.autoTag || false;
 
             // Apply dark mode immediately
             document.body.classList.toggle('light-mode', result.darkMode === false);
@@ -84,7 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
             aiModel: document.getElementById('ai-model').value,
             apiKey: document.getElementById('api-key').value,
             darkMode: document.getElementById('dark-mode').checked,
-            autoCopy: document.getElementById('auto-copy').checked
+            autoCopy: document.getElementById('auto-copy').checked,
+            autoTag: document.getElementById('auto-tag').checked
         };
 
         try {

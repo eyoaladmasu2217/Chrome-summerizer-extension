@@ -198,6 +198,39 @@ h1 {
     transform: translateY(-1px);
 }
 
+/* tag input field */
+.tag-input-container {
+    margin: 8px 0 16px;
+}
+.tag-input-container input {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--glass-border);
+    background: var(--card-bg);
+    color: var(--text-main);
+    transition: border-color 0.2s;
+}
+.tag-input-container input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* history tags display */
+.history-tags {
+    margin: 6px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.tag-chip {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 2px 6px;
+    border-radius: var(--border-radius-sm);
+    font-size: 12px;
+}
+
 .tab-button.active {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;

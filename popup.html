@@ -105,6 +105,10 @@
                 <i class="material-icons-round">schedule</i>
                 <span id="last-updated-time"></span>
             </div>
+            <!-- Tags input for manual labeling -->
+            <div class="tag-input-container">
+                <input type="text" id="summary-tags" placeholder="Add tags (comma separated)" aria-label="Tags">
+            </div>
 
             <div id="insights-bar" class="insights-bar" style="display: none;">
                 <div class="insight-pill">
@@ -264,6 +268,14 @@
                     <button id="csv-btn" class="buttons" aria-label="Download CSV">
                         <i class="material-icons-round">table_chart</i>
                         CSV
+                    </button>
+                    <button id="open-new-tab-btn" class="buttons" aria-label="Open in new tab">
+                        <i class="material-icons-round">open_in_new</i>
+                        New Tab
+                    </button>
+                    <button id="tweet-btn" class="buttons" aria-label="Share on Twitter">
+                        <i class="material-icons-round">share</i>
+                        Tweet
                     </button>
                     <button id="share-btn" class="buttons" aria-label="Share summary">
                         <i class="material-icons-round">link</i>

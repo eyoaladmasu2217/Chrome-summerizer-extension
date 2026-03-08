@@ -10,5 +10,6 @@ export const STORAGE_KEYS = {
     AI_MODEL: 'aiModel',
     API_KEY: 'apiKey',
     DARK_MODE: 'darkMode',
-    AUTO_COPY: 'autoCopy'
+    AUTO_COPY: 'autoCopy',
+    AUTO_TAG: 'autoTag'
 };

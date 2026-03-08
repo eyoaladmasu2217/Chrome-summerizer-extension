@@ -8,7 +8,18 @@
 
 ---
 
-## 💎 Core Capabilities
+## � New Features
+
+- Tagging system: manually add tags to summarized content and filter history by tags.
+- Auto-tagging: optionally generate tags from AI-provided keywords (configurable in settings).
+- Click on any tag in history to filter results instantly.
+- Horizon-friendly theme: auto-detects and follows system dark/light preference.
+- Unsaved draft warning when tags are entered but not saved.
+- Open summaries quickly in a new browser tab.
+- One-click tweet support for instant sharing on Twitter.
+- `Ctrl+T` shortcut focuses the tag input field.
+
+## �💎 Core Capabilities
 
 ### 📄 Intelligent Web Summarization
 Transform any webpage into a structured report with a single click. Our AI identifies:

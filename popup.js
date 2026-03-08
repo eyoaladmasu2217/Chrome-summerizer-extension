@@ -52,6 +52,15 @@ window.addEventListener('DOMContentLoaded', () => {
     loadHistory();
     loadStats();
     checkApiKey();
+
+    // warn if user has entered tags but hasn't summarized/bookmarked
+    window.addEventListener('beforeunload', (e) => {
+        const tagInput = document.getElementById('summary-tags');
+        if (tagInput && tagInput.value.trim()) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
 });
 
 const checkApiKey = async () => {
@@ -117,15 +126,28 @@ const initSettings = () => {
     (async () => {
         try {
             const result = await storageGet([STORAGE_KEYS.DARK_MODE, STORAGE_KEYS.AUTO_COPY]);
-            const darkMode = result.darkMode !== false; // default dark
-            document.body.classList.toggle('light-mode', !darkMode);
-            updateThemeIcon(darkMode);
-            if (result.autoCopy && autocopyChip) {
-                autocopyChip.style.display = 'flex';
-            }
-        } catch (e) {
-            Logger.error('Failed to load initial settings', e);
-        }
+                let darkMode;
+                if (result.darkMode === undefined) {
+                    // use system preference when not explicitly set
+                    darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                } else {
+                    darkMode = result.darkMode;
+                }
+                document.body.classList.toggle('light-mode', !darkMode);
+                updateThemeIcon(darkMode);
+                if (result.autoCopy && autocopyChip) {
+                    autocopyChip.style.display = 'flex';
+                }
+
+                // listen for system changes when user hasn't locked preference
+                const mql = window.matchMedia('(prefers-color-scheme: dark)');
+                mql.addEventListener('change', e => {
+                    if (result.darkMode === undefined) {
+                        const sysDark = e.matches;
+                        document.body.classList.toggle('light-mode', !sysDark);
+                        updateThemeIcon(sysDark);
+                    }
+                });
     })();
 
     themeToggle.addEventListener('click', () => {
@@ -218,6 +240,27 @@ const initEventListeners = () => {
     summarizeBtn.addEventListener('click', () => handleSummarize());
     regenerateBtn.addEventListener('click', () => handleSummarize());
     eli5Btn.addEventListener('click', () => handleSummarize(true));
+
+    const openNewTabBtn = document.getElementById('open-new-tab-btn');
+
+    openNewTabBtn.addEventListener('click', () => {
+        const text = textarea.value;
+        if (!text) return;
+        const html = `<html><head><title>Summary</title><style>body{font-family:sans-serif;padding:40px;background:#f8fafc;color:#0f172a;}pre{white-space:pre-wrap;font-family:inherit;}</style></head><body><h1>Summary</h1><pre>${text}</pre></body></html>`;
+        const newWin = window.open();
+        if (newWin) {
+            newWin.document.write(html);
+            newWin.document.close();
+        }
+    });
+
+    const tweetBtn = document.getElementById('tweet-btn');
+    tweetBtn.addEventListener('click', () => {
+        const text = textarea.value;
+        if (!text) return;
+        const twUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(twUrl, '_blank');
+    });
 
     emailBtn.addEventListener('click', () => {
         const text = textarea.value;
@@ -422,7 +465,7 @@ const initEventListeners = () => {
                 mimeType = 'application/json';
                 extension = 'json';
             } else if (format === 'csv') {
-                const headers = ['Title', 'URL', 'Summary', 'Date', 'Model', 'Sentiment', 'Reading Time'];
+                const headers = ['Title', 'URL', 'Summary', 'Date', 'Model', 'Sentiment', 'Reading Time', 'Tags'];
                 const csvRows = summaries.map(s => [
                     `"${(s.title || '').replace(/"/g, '""')}"`,
                     s.url || '',
@@ -430,14 +473,15 @@ const initEventListeners = () => {
                     s.date || '',
                     s.model || '',
                     s.sentiment || '',
-                    s.readingTime || 0
+                    s.readingTime || 0,
+                    `"${(s.tags || []).join(', ').replace(/"/g, '""')}"`
                 ]);
                 content = [headers, ...csvRows].map(row => row.join(',')).join('\n');
                 mimeType = 'text/csv';
                 extension = 'csv';
             } else {
                 content = summaries.map(s => 
-                    `Title: ${s.title}\nURL: ${s.url}\nDate: ${new Date(s.date).toLocaleString()}\nModel: ${s.model}\nSentiment: ${s.sentiment}\nReading Time: ${s.readingTime || 0} min\n\n${s.summary}\n\n---\n\n`
+                    `Title: ${s.title}\nURL: ${s.url}\nDate: ${new Date(s.date).toLocaleString()}\nModel: ${s.model}\nSentiment: ${s.sentiment}\nReading Time: ${s.readingTime || 0} min\nTags: ${(s.tags||[]).join(', ')}\n\n${s.summary}\n\n---\n\n`
                 ).join('');
                 mimeType = 'text/plain';
                 extension = 'txt';
@@ -465,11 +509,18 @@ const initEventListeners = () => {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         const settings = await chrome.storage.sync.get(['aiModel']);
         const model = settings.aiModel || DEFAULT_MODEL;
+        // gather tags at time of bookmarking as well
+        const tagInput = document.getElementById('summary-tags');
+        let bookmarkTags = [];
+        if (tagInput && tagInput.value.trim()) {
+            bookmarkTags = tagInput.value.split(',').map(t => t.trim()).filter(Boolean);
+        }
         const bookmark = {
             id: Date.now().toString(),
             title: tab?.title || 'Bookmarked Summary',
             url: tab?.url || '',
             summary: summary,
+            tags: bookmarkTags,
             date: Date.now(),
             model: model,
             bookmarked: true
@@ -595,6 +646,11 @@ const initEventListeners = () => {
                 bookmarkSummary(summary);
             }
         }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 't') {
+            e.preventDefault();
+            const tagField = document.getElementById('summary-tags');
+            if (tagField) tagField.focus();
+        }
     });
 
     copyBtn.addEventListener('click', () => {
@@ -710,12 +766,22 @@ const updateStepStatus = (stepNumber, status) => {
 const handleSummarize = async (isEli5 = false) => {
     const summarizeBtn = document.getElementById('summarize-btn');
     const textarea = document.getElementById('summary');
+    const tagInput = document.getElementById('summary-tags');
     const readingTime = document.getElementById('reading-time');
     const linksList = document.getElementById('links-list');
     const linksSection = document.getElementById('links-section');
     const skeleton = document.getElementById('skeleton-loader');
     const statusSteps = document.getElementById('status-steps');
     const errorContainer = document.getElementById('error-container');
+
+    // read auto-tag setting early
+    let autoTagEnabled = true;
+    try {
+        const cfg = await chrome.storage.sync.get(['autoTag']);
+        autoTagEnabled = cfg.autoTag !== false;
+    } catch (e) {
+        // ignore, default to true
+    }
 
     summarizeBtn.innerText = 'Summarizing...';
     summarizeBtn.disabled = true;
@@ -771,6 +837,12 @@ const handleSummarize = async (isEli5 = false) => {
             }
         }
 
+        // auto-tags from keywords metadata if enabled
+        let autoTags = [];
+        if (autoTagEnabled && keywords && keywords !== 'N/A') {
+            autoTags = keywords.split(',').map(t => t.trim()).filter(Boolean);
+        }
+
         document.getElementById('content-category').textContent = category;
         document.getElementById('content-sentiment').textContent = sentiment;
         document.getElementById('content-keywords').textContent = keywords;
@@ -795,10 +867,15 @@ const handleSummarize = async (isEli5 = false) => {
         chatHistory = []; // Reset chat history for new summary
         document.getElementById('chat-messages').innerHTML = ''; // Clear old messages
 
-
         const now = new Date().toLocaleTimeString();
         document.getElementById('last-updated-time').textContent = `Summarized at ${now}`;
         document.getElementById('last-updated-container').style.display = 'flex';
+
+        // compute tags from input and metadata keywords (later)
+        let userTags = [];
+        if (tagInput && tagInput.value.trim()) {
+            userTags = tagInput.value.split(',').map(t => t.trim()).filter(Boolean);
+        }
 
         // Brief delay for visual feedback
         await new Promise(r => setTimeout(r, 600));
@@ -815,11 +892,13 @@ const handleSummarize = async (isEli5 = false) => {
         });
 
         // Save to local storage
+        const allTags = [...new Set([...(userTags || []), ...(autoTags || [])])];
         const historyItem = {
             id: Date.now(),
             url: tab.url,
             title: tab.title,
             summary: summary,
+            tags: allTags,
             model: settings.aiModel || DEFAULT_MODEL,
             sentiment: sentiment,
             date: new Date().toISOString(),
@@ -1001,7 +1080,8 @@ const loadHistory = (searchQuery = '') => {
             const query = searchQuery.toLowerCase();
             summaries = summaries.filter(item =>
                 (item.title || '').toLowerCase().includes(query) ||
-                (item.summary || '').toLowerCase().includes(query)
+                (item.summary || '').toLowerCase().includes(query) ||
+                (item.tags || []).some(t => t.toLowerCase().includes(query))
             );
         }
 
@@ -1071,6 +1151,19 @@ const loadHistory = (searchQuery = '') => {
             preview.className = 'history-preview';
             preview.textContent = (item.summary || '').substring(0, 80).replace(/<[^>]*>/g, '') + '...';
 
+            // tags display
+            if (item.tags && item.tags.length) {
+                const tagContainer = document.createElement('div');
+                tagContainer.className = 'history-tags';
+                item.tags.forEach(t => {
+                    const span = document.createElement('span');
+                    span.className = 'tag-chip';
+                    span.textContent = t;
+                    tagContainer.appendChild(span);
+                });
+                div.appendChild(tagContainer);
+            }
+
             const actions = document.createElement('div');
             actions.className = 'history-actions';
 
@@ -1116,6 +1209,15 @@ const loadHistory = (searchQuery = '') => {
 
         // Event delegation for history actions
         historyList.onclick = (e) => {
+            // tag click filtering
+            if (e.target.classList.contains('tag-chip')) {
+                const tag = e.target.textContent;
+                historySearch.value = tag;
+                loadHistory(tag);
+                clearSearchBtn.style.display = 'flex';
+                return;
+            }
+
             const btn = e.target.closest('button');
             if (!btn) return;
 
