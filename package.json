@@ -4,7 +4,9 @@
   "description": "AI-powered web content summarizer Chrome extension",
   "scripts": {
     "lint": "eslint \"**/*.js\"",
-    "lint:fix": "eslint \"**/*.js\" --fix"
+    "lint:fix": "eslint \"**/*.js\" --fix",
+    "version": "npm run lint && echo \"Version bumped to $npm_package_version\"",
+    "prepare": "echo \"Preparing package...\""
   },
   "devDependencies": {
     "eslint": "^8.57.0"
