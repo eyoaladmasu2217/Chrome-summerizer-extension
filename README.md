@@ -12,7 +12,7 @@
 
 - Tagging system: manually add tags to summarized content and filter history by tags.
 - Auto-tagging: optionally generate tags from AI-provided keywords (configurable in settings).
-- Click on any tag in history to filter results instantly.
+- Click on any tag in history to filter results instantly (double-click to remove it from that entry).
 - Horizon-friendly theme: auto-detects and follows system dark/light preference.
 - Unsaved draft warning when tags are entered but not saved.
 - Open summaries quickly in a new browser tab.
