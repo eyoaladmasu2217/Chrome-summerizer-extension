@@ -17,6 +17,7 @@
 - Unsaved draft warning when tags are entered but not saved.
 - Open summaries quickly in a new browser tab.
 - One-click tweet support for instant sharing on Twitter.
+- **Translate** button allows quick conversion of any summary into the chosen output language using the AI engine.
 - `Ctrl+T` shortcut focuses the tag input field.
 
 ## �💎 Core Capabilities
