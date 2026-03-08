@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = document.getElementById('status');
     const saveBtn = document.getElementById('save-btn');
 
+    // display current extension version
+    const versionLabel = document.getElementById('version-label');
+    if (versionLabel && chrome.runtime && chrome.runtime.getManifest) {
+        versionLabel.textContent = `v${chrome.runtime.getManifest().version}`;
+    }
     // Tab switching
     const settingsTab = document.getElementById('settings-tab');
     const statsTab = document.getElementById('stats-tab');
