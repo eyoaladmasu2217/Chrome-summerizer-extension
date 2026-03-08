@@ -262,6 +262,52 @@ const initEventListeners = () => {
         window.open(twUrl, '_blank');
     });
 
+    const translateBtn = document.getElementById('translate-btn');
+    translateBtn.addEventListener('click', async () => {
+        const text = textarea.value;
+        if (!text) return;
+        try {
+            const cfg = await chrome.storage.sync.get(['outputLanguage','apiKey','aiModel']);
+            const lang = cfg.outputLanguage || 'en';
+            const apiKey = cfg.apiKey;
+            const model = cfg.aiModel || DEFAULT_MODEL;
+            if (!apiKey) {
+                showToast('API Key missing', 'error');
+                return;
+            }
+            showChatLoading(true); // reuse loading indicator for quick feedback
+            const payload = {
+                model,
+                messages: [
+                    { role: 'system', content: `You are a helpful translator.` },
+                    { role: 'user', content: `Translate the following text into ${lang}:
+
+${text}` }
+                ],
+                temperature: 0.3
+            };
+            const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error?.message || 'Translation failed');
+            }
+            const translated = data.choices[0].message.content;
+            textarea.value = translated;
+            showToast('Translation complete');
+        } catch (err) {
+            showToast(err.message || 'Translation error', 'error');
+        } finally {
+            showChatLoading(false);
+        }
+    });
+
     emailBtn.addEventListener('click', () => {
         const text = textarea.value;
         if (!text) return;
