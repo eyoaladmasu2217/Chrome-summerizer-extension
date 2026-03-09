@@ -1333,9 +1333,15 @@ const loadHistory = (searchQuery = '') => {
                     const span = document.createElement('span');
                     span.className = 'tag-chip';
                     span.dataset.tag = t;
-                    span.innerHTML = `${t} <span class="tag-remove">&times;</span>`;
+                    span.innerHTML = `${t} <span class="tag-edit" title="Edit tag">✎</span><span class="tag-remove" title="Remove tag">&times;</span>`;
                     tagContainer.appendChild(span);
                 });
+                // Add new tag input
+                const addTagSpan = document.createElement('span');
+                addTagSpan.className = 'tag-chip add-tag';
+                addTagSpan.innerHTML = '<i class="material-icons-round" style="font-size: 12px;">add</i>';
+                addTagSpan.title = 'Add new tag';
+                tagContainer.appendChild(addTagSpan);
                 div.appendChild(tagContainer);
             }
 
@@ -1384,6 +1390,55 @@ const loadHistory = (searchQuery = '') => {
 
         // Event delegation for history actions
         historyList.onclick = (e) => {
+            // tag edit icon click
+            if (e.target.classList.contains('tag-edit')) {
+                const parentChip = e.target.closest('.tag-chip');
+                const oldTag = parentChip.dataset.tag;
+                const itemDiv = e.target.closest('.history-item');
+                const id = parseInt(itemDiv.dataset.id);
+                
+                const newTag = prompt('Edit tag:', oldTag);
+                if (newTag && newTag.trim() && newTag !== oldTag) {
+                    chrome.storage.local.get(['summaries'], (res) => {
+                        const summaries = res.summaries || [];
+                        const idx = summaries.findIndex(s => s.id === id);
+                        if (idx !== -1) {
+                            const tagIndex = summaries[idx].tags.indexOf(oldTag);
+                            if (tagIndex !== -1) {
+                                summaries[idx].tags[tagIndex] = newTag.trim();
+                                chrome.storage.local.set({ summaries }, () => {
+                                    loadHistory(historySearch.value);
+                                    showToast('Tag updated');
+                                });
+                            }
+                        }
+                    });
+                }
+                return;
+            }
+
+            // add tag icon click
+            if (e.target.closest('.add-tag')) {
+                const itemDiv = e.target.closest('.history-item');
+                const id = parseInt(itemDiv.dataset.id);
+                
+                const newTag = prompt('Add new tag:');
+                if (newTag && newTag.trim()) {
+                    chrome.storage.local.get(['summaries'], (res) => {
+                        const summaries = res.summaries || [];
+                        const idx = summaries.findIndex(s => s.id === id);
+                        if (idx !== -1) {
+                            summaries[idx].tags = [...new Set([...(summaries[idx].tags || []), newTag.trim()])];
+                            chrome.storage.local.set({ summaries }, () => {
+                                loadHistory(historySearch.value);
+                                showToast('Tag added');
+                            });
+                        }
+                    });
+                }
+                return;
+            }
+
             // remove icon click
             if (e.target.classList.contains('tag-remove')) {
                 const parentChip = e.target.closest('.tag-chip');
