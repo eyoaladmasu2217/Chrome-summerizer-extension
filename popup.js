@@ -522,6 +522,20 @@ ${text}` }
         }
     });
 
+    const compareModeBtn = document.getElementById('compare-mode-btn');
+    compareModeBtn.addEventListener('click', () => {
+        compareMode = !compareMode;
+        selectedForCompare = [];
+        compareModeBtn.innerHTML = compareMode ? 
+            '<i class="material-icons-round">cancel</i> Exit Compare' : 
+            '<i class="material-icons-round">compare</i> Compare';
+        compareModeBtn.classList.toggle('active', compareMode);
+        loadHistory(historySearch.value);
+        if (compareMode) {
+            showToast('Select two summaries to compare');
+        }
+    });
+
     const exportAllHistory = (format = 'txt') => {
         chrome.storage.local.get(['summaries'], (result) => {
             const summaries = result.summaries || [];
@@ -714,6 +728,73 @@ ${text}` }
             Logger.error('Batch summarization error:', error);
             showToast('Batch summarization failed', 'error');
         }
+    };
+
+    const showComparison = (ids) => {
+        chrome.storage.local.get(['summaries'], (result) => {
+            const summaries = result.summaries || [];
+            const items = ids.map(id => summaries.find(s => s.id === id)).filter(Boolean);
+            
+            if (items.length !== 2) return;
+            
+            // Create comparison modal/view
+            const comparisonHTML = `
+                <div class="comparison-overlay" id="comparison-overlay">
+                    <div class="comparison-modal">
+                        <div class="comparison-header">
+                            <h3>Summary Comparison</h3>
+                            <button id="close-comparison" class="icon-btn">
+                                <i class="material-icons-round">close</i>
+                            </button>
+                        </div>
+                        <div class="comparison-content">
+                            <div class="comparison-item">
+                                <div class="comparison-title">
+                                    <h4>${items[0].title || 'Untitled'}</h4>
+                                    <div class="comparison-meta">
+                                        <span class="model-badge">${items[0].model || DEFAULT_MODEL}</span>
+                                        <span class="sentiment-badge">${items[0].sentiment || 'Neutral'}</span>
+                                        <span class="date-badge">${new Date(items[0].date).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <div class="comparison-summary">
+                                    ${items[0].summary || ''}
+                                </div>
+                            </div>
+                            <div class="comparison-divider">
+                                <i class="material-icons-round">compare_arrows</i>
+                            </div>
+                            <div class="comparison-item">
+                                <div class="comparison-title">
+                                    <h4>${items[1].title || 'Untitled'}</h4>
+                                    <div class="comparison-meta">
+                                        <span class="model-badge">${items[1].model || DEFAULT_MODEL}</span>
+                                        <span class="sentiment-badge">${items[1].sentiment || 'Neutral'}</span>
+                                        <span class="date-badge">${new Date(items[1].date).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <div class="comparison-summary">
+                                    ${items[1].summary || ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', comparisonHTML);
+            
+            // Close comparison handler
+            document.getElementById('close-comparison').addEventListener('click', () => {
+                document.getElementById('comparison-overlay').remove();
+            });
+            
+            document.getElementById('comparison-overlay').addEventListener('click', (e) => {
+                if (e.target.id === 'comparison-overlay') {
+                    document.getElementById('comparison-overlay').remove();
+                }
+            });
+        });
     };
 
     const bookmarkSummary = async (summary) => {
@@ -1380,6 +1461,8 @@ const getSummary = async (text, links = [], isEli5 = false, template = 'default'
 
 
 let historySortDescending = true; // newest first by default
+let compareMode = false;
+let selectedForCompare = [];
 const loadHistory = (searchQuery = '') => {
     chrome.storage.local.get(['summaries'], (result) => {
         const historyList = document.getElementById('history-list');
@@ -1457,8 +1540,18 @@ const loadHistory = (searchQuery = '') => {
 
         summaries.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'history-item';
+            div.className = `history-item ${compareMode ? 'compare-mode' : ''}`;
             div.dataset.id = item.id;
+
+            // Add compare checkbox if in compare mode
+            if (compareMode) {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'compare-checkbox';
+                checkbox.dataset.id = item.id;
+                checkbox.checked = selectedForCompare.includes(item.id);
+                div.appendChild(checkbox);
+            }
 
             const header = document.createElement('div');
             header.className = 'history-header';
@@ -1576,6 +1669,29 @@ const loadHistory = (searchQuery = '') => {
 
         // Event delegation for history actions
         historyList.onclick = (e) => {
+            // compare checkbox click
+            if (e.target.classList.contains('compare-checkbox')) {
+                const checkbox = e.target;
+                const id = parseInt(checkbox.dataset.id);
+                
+                if (checkbox.checked) {
+                    if (selectedForCompare.length < 2) {
+                        selectedForCompare.push(id);
+                    } else {
+                        checkbox.checked = false;
+                        showToast('Maximum 2 summaries can be compared', 'error');
+                        return;
+                    }
+                } else {
+                    selectedForCompare = selectedForCompare.filter(selectedId => selectedId !== id);
+                }
+                
+                if (selectedForCompare.length === 2) {
+                    showComparison(selectedForCompare);
+                }
+                return;
+            }
+
             // tag edit icon click
             if (e.target.classList.contains('tag-edit')) {
                 const parentChip = e.target.closest('.tag-chip');

@@ -2014,3 +2014,119 @@ body.reading-mode #exit-reading-mode {
     font-size: 12px;
     color: var(--text-muted);
 }
+
+/* Comparison Modal */
+.comparison-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.comparison-modal {
+    background: var(--card-bg);
+    border-radius: var(--border-radius-xl);
+    border: 1px solid var(--glass-border);
+    max-width: 1200px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.comparison-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.comparison-header h3 {
+    margin: 0;
+    color: var(--text-main);
+}
+
+.comparison-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.comparison-item {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.comparison-title h4 {
+    margin: 0 0 12px 0;
+    color: var(--text-main);
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.comparison-meta {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.model-badge, .sentiment-badge, .date-badge {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+}
+
+.model-badge {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.sentiment-badge {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.date-badge {
+    background: var(--glass-highlight);
+    color: var(--text-muted);
+}
+
+.comparison-summary {
+    flex: 1;
+    line-height: 1.6;
+    color: var(--text-main);
+    white-space: pre-wrap;
+}
+
+.comparison-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    color: var(--text-muted);
+    font-size: 24px;
+}
+
+.compare-checkbox {
+    margin-right: 12px;
+    transform: scale(1.2);
+}
+
+.history-item.compare-mode {
+    padding-left: 8px;
+}
