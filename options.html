@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summarize AI Settings</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             min-height: 100vh;
@@ -269,6 +270,30 @@
                         <span id="ai-interactions" class="stat-number">0</span>
                         <label>AI Interactions</label>
                     </div>
+                </div>
+                <div class="stat-card">
+                    <i class="material-icons-round">trending_up</i>
+                    <div class="stat-info">
+                        <span id="avg-session-time" class="stat-number">0m</span>
+                        <label>Avg. Session Time</label>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="material-icons-round">model_training</i>
+                    <div class="stat-info">
+                        <span id="most-used-model" class="stat-number">-</span>
+                        <label>Most Used Model</label>
+                    </div>
+                </div>
+            </div>
+            <div class="analytics-charts">
+                <div class="chart-container">
+                    <h4>Usage Over Time (Last 7 Days)</h4>
+                    <canvas id="usage-chart" width="400" height="200"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Model Distribution</h4>
+                    <canvas id="model-chart" width="400" height="200"></canvas>
                 </div>
             </div>
             <div class="stats-details">

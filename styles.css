@@ -1976,6 +1976,38 @@ body.reading-mode #exit-reading-mode {
     letter-spacing: 0.5px;
 }
 
+.charts-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.chart-container {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.chart-container h3 {
+    margin-bottom: 16px;
+    color: var(--text-main);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.chart-wrapper {
+    height: 250px;
+    position: relative;
+}
+
+#usage-chart, #model-chart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 .stats-details h3 {
     margin-bottom: 16px;
     color: var(--text-main);

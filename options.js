@@ -291,11 +291,92 @@ const loadStatistics = () => {
         const bookmarkedCount = summaries.filter(s => s.bookmarked).length;
         const totalTime = summaries.reduce((sum, s) => sum + (s.readingTime || 0), 0);
         const aiInteractions = summaries.length; // Assuming each summary is an AI interaction
+        const avgSessionTime = totalSummaries > 0 ? Math.round(totalTime / totalSummaries) : 0;
+
+        // Most used model
+        const modelCounts = {};
+        summaries.forEach(s => {
+            const model = s.model || 'Unknown';
+            modelCounts[model] = (modelCounts[model] || 0) + 1;
+        });
+        const mostUsedModel = Object.keys(modelCounts).reduce((a, b) => 
+            modelCounts[a] > modelCounts[b] ? a : b, 'None');
 
         document.getElementById('total-summaries').textContent = totalSummaries;
         document.getElementById('total-time').textContent = `${totalTime}m`;
         document.getElementById('bookmarked-count').textContent = bookmarkedCount;
         document.getElementById('ai-interactions').textContent = aiInteractions;
+        document.getElementById('avg-session-time').textContent = `${avgSessionTime}m`;
+        document.getElementById('most-used-model').textContent = mostUsedModel;
+
+        // Usage over time chart (last 7 days)
+        const last7Days = Array.from({length: 7}, (_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() - (6 - i));
+            return date.toISOString().split('T')[0];
+        });
+
+        const usageData = last7Days.map(date => {
+            return summaries.filter(s => 
+                new Date(s.date).toISOString().split('T')[0] === date
+            ).length;
+        });
+
+        const usageChartCanvas = document.getElementById('usage-chart');
+        if (usageChartCanvas) {
+            new Chart(usageChartCanvas, {
+                type: 'line',
+                data: {
+                    labels: last7Days.map(date => new Date(date).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Summaries',
+                        data: usageData,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        }
+
+        // Model distribution chart
+        const modelLabels = Object.keys(modelCounts);
+        const modelData = Object.values(modelCounts);
+
+        const modelChartCanvas = document.getElementById('model-chart');
+        if (modelChartCanvas) {
+            new Chart(modelChartCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: modelLabels,
+                    datasets: [{
+                        data: modelData,
+                        backgroundColor: [
+                            '#6366f1', '#ec4899', '#10b981', '#f59e0b', 
+                            '#8b5cf6', '#06b6d4', '#f97316', '#84cc16'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
 
         // Recent activity
         const recentActivity = document.getElementById('recent-activity');
