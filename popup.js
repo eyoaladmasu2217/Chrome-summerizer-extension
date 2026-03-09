@@ -542,6 +542,53 @@ ${text}` }
                 content = [headers, ...csvRows].map(row => row.join(',')).join('\n');
                 mimeType = 'text/csv';
                 extension = 'csv';
+            } else if (format === 'pdf') {
+                // Generate PDF using jsPDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFontSize(20);
+                doc.text('Summarize AI - History Export', 20, 30);
+                doc.setFontSize(12);
+                doc.text(`Generated on ${new Date().toLocaleString()}`, 20, 45);
+                doc.text(`Total summaries: ${summaries.length}`, 20, 55);
+                
+                let yPosition = 70;
+                summaries.forEach((s, index) => {
+                    if (yPosition > 250) { // New page if needed
+                        doc.addPage();
+                        yPosition = 30;
+                    }
+                    
+                    doc.setFontSize(14);
+                    doc.text(`Summary ${index + 1}: ${s.title || 'Untitled'}`, 20, yPosition);
+                    yPosition += 10;
+                    
+                    doc.setFontSize(10);
+                    doc.text(`URL: ${s.url || ''}`, 20, yPosition);
+                    yPosition += 8;
+                    doc.text(`Date: ${new Date(s.date).toLocaleString()}`, 20, yPosition);
+                    yPosition += 8;
+                    doc.text(`Model: ${s.model || ''} | Sentiment: ${s.sentiment || ''} | Reading Time: ${s.readingTime || 0} min`, 20, yPosition);
+                    yPosition += 8;
+                    if (s.tags && s.tags.length > 0) {
+                        doc.text(`Tags: ${s.tags.join(', ')}`, 20, yPosition);
+                        yPosition += 8;
+                    }
+                    
+                    // Add summary text with word wrapping
+                    const summaryLines = doc.splitTextToSize(s.summary || '', 170);
+                    doc.text(summaryLines, 20, yPosition);
+                    yPosition += summaryLines.length * 5 + 10;
+                    
+                    // Separator line
+                    doc.line(20, yPosition, 190, yPosition);
+                    yPosition += 15;
+                });
+                
+                doc.save(`summaries-export-${Date.now()}.pdf`);
+                showToast('PDF exported successfully!');
+                return; // PDF is handled differently, no blob download
             } else {
                 content = summaries.map(s => 
                     `Title: ${s.title}\nURL: ${s.url}\nDate: ${new Date(s.date).toLocaleString()}\nModel: ${s.model}\nSentiment: ${s.sentiment}\nReading Time: ${s.readingTime || 0} min\nTags: ${(s.tags||[]).join(', ')}\n\n${s.summary}\n\n---\n\n`
@@ -625,6 +672,7 @@ ${text}` }
     const quickExport = document.getElementById('quick-export');
     const quickExportJson = document.getElementById('quick-export-json');
     const quickExportCsv = document.getElementById('quick-export-csv');
+    const quickExportPdf = document.getElementById('quick-export-pdf');
     const quickClear = document.getElementById('quick-clear');
 
     const bookmarkBtn = document.getElementById('bookmark-btn');
@@ -671,6 +719,11 @@ ${text}` }
     quickExportCsv.addEventListener('click', () => {
         quickActionsMenu.style.display = 'none';
         exportAllHistory('csv');
+    });
+
+    quickExportPdf.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        exportAllHistory('pdf');
     });
 
     quickClear.addEventListener('click', () => {
