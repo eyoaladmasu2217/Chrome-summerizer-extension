@@ -623,6 +623,99 @@ ${text}` }
         });
     };
 
+    const batchSummarizeTabs = async () => {
+        try {
+            const tabs = await chrome.tabs.query({ currentWindow: true });
+            const validTabs = tabs.filter(tab => 
+                tab.url.startsWith('http') && 
+                !tab.url.includes('chrome://') && 
+                !tab.url.includes('chrome-extension://')
+            );
+            
+            if (validTabs.length === 0) {
+                showToast('No valid tabs to summarize', 'error');
+                return;
+            }
+            
+            if (!confirm(`Summarize ${validTabs.length} tabs? This may take some time.`)) {
+                return;
+            }
+            
+            showToast(`Starting batch summarization of ${validTabs.length} tabs...`);
+            
+            for (let i = 0; i < validTabs.length; i++) {
+                const tab = validTabs[i];
+                try {
+                    showToast(`Summarizing tab ${i + 1}/${validTabs.length}: ${tab.title}`);
+                    
+                    const pageData = await getPageData(tab.id);
+                    if (!pageData || !pageData.text || pageData.text.length < 50) {
+                        continue; // Skip tabs with insufficient content
+                    }
+                    
+                    const template = document.getElementById('summary-template')?.value || 'default';
+                    const summary = await getSummary(pageData.text, pageData.links, false, template);
+                    
+                    // Extract metadata
+                    let category = 'General';
+                    let sentiment = 'Neutral';
+                    let keywords = 'N/A';
+                    let displaySummary = summary;
+                    
+                    const metadataMatch = summary.match(/\[METADATA\]:\s*CATEGORY:\s*([^,]+),\s*SENTIMENT:\s*([^,]+),\s*KEYWORDS:\s*([^\n]+)/i);
+                    if (metadataMatch) {
+                        category = metadataMatch[1].trim();
+                        sentiment = metadataMatch[2].trim();
+                        keywords = metadataMatch[3].trim();
+                        displaySummary = summary.replace(/\[METADATA\]:[^\n]+\n?/, '').trim();
+                    }
+                    
+                    // Auto-tags
+                    let autoTags = [];
+                    if (keywords && keywords !== 'N/A') {
+                        autoTags = keywords.split(',').map(t => t.trim()).filter(Boolean);
+                    }
+                    
+                    const wordCount = pageData.text.trim().split(/\s+/).length;
+                    const minutes = Math.ceil(wordCount / 200);
+                    
+                    const historyItem = {
+                        id: Date.now() + i, // Ensure unique IDs
+                        url: tab.url,
+                        title: tab.title,
+                        summary: summary,
+                        tags: autoTags,
+                        model: DEFAULT_MODEL,
+                        sentiment: sentiment,
+                        date: new Date().toISOString(),
+                        readingTime: minutes
+                    };
+                    
+                    chrome.storage.local.get(['summaries'], (result) => {
+                        const summaries = result.summaries || [];
+                        summaries.unshift(historyItem);
+                        chrome.storage.local.set({ summaries: summaries.slice(0, 50) });
+                    });
+                    
+                    updateStats(minutes);
+                    
+                    // Small delay between summaries to avoid rate limits
+                    await new Promise(r => setTimeout(r, 1000));
+                    
+                } catch (error) {
+                    Logger.error(`Failed to summarize tab ${tab.title}:`, error);
+                }
+            }
+            
+            loadHistory();
+            showToast(`Batch summarization completed!`);
+            
+        } catch (error) {
+            Logger.error('Batch summarization error:', error);
+            showToast('Batch summarization failed', 'error');
+        }
+    };
+
     const bookmarkSummary = async (summary) => {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         const settings = await chrome.storage.sync.get(['aiModel']);
@@ -732,6 +825,12 @@ ${text}` }
     quickExportPdf.addEventListener('click', () => {
         quickActionsMenu.style.display = 'none';
         exportAllHistory('pdf');
+    });
+
+    const quickBatch = document.getElementById('quick-batch');
+    quickBatch.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        batchSummarizeTabs();
     });
 
     quickClear.addEventListener('click', () => {
