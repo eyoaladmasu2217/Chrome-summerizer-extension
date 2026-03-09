@@ -43,6 +43,255 @@ let isReading = false;
 let showBookmarksOnly = false;
 let isOnline = navigator.onLine;
 let cachedSummaries = new Map();
+let currentDraft = null;
+let autoSaveInterval = null;
+
+// Auto-save drafts functionality
+const initAutoSave = () => {
+    // Load existing draft for current page
+    loadCurrentDraft();
+    
+    // Start auto-save interval (every 30 seconds)
+    autoSaveInterval = setInterval(autoSaveDraft, 30000);
+    
+    // Save on page unload
+    window.addEventListener('beforeunload', saveDraftOnUnload);
+};
+
+const loadCurrentDraft = async () => {
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!tab?.url) return;
+        
+        const result = await storageGet(['drafts']);
+        const drafts = result.drafts || [];
+        const draft = drafts.find(d => d.url === tab.url);
+        
+        if (draft) {
+            currentDraft = draft;
+            // Ask user if they want to restore the draft
+            showDraftRestoreModal(draft);
+        }
+    } catch (error) {
+        Logger.error('Failed to load draft:', error);
+    }
+};
+
+const showDraftRestoreModal = (draft) => {
+    const modal = document.createElement('div');
+    modal.className = 'draft-restore-modal-overlay';
+    modal.innerHTML = `
+        <div class="draft-restore-modal">
+            <div class="draft-restore-header">
+                <h3>Draft Found</h3>
+                <span class="draft-restore-date">Last saved: ${new Date(draft.savedAt).toLocaleString()}</span>
+            </div>
+            <div class="draft-restore-content">
+                <p>Found an unsaved draft for this page. Would you like to restore it?</p>
+                <div class="draft-preview">
+                    <strong>Summary:</strong> ${draft.summary.substring(0, 100)}${draft.summary.length > 100 ? '...' : ''}
+                    ${draft.tags.length > 0 ? `<br><strong>Tags:</strong> ${draft.tags.join(', ')}` : ''}
+                </div>
+            </div>
+            <div class="draft-restore-actions">
+                <button class="restore-draft-btn">Restore Draft</button>
+                <button class="discard-draft-btn">Start Fresh</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.restore-draft-btn').addEventListener('click', () => {
+        restoreDraft(draft);
+        modal.remove();
+    });
+    
+    modal.querySelector('.discard-draft-btn').addEventListener('click', () => {
+        deleteDraft(draft.url);
+        modal.remove();
+    });
+};
+
+const restoreDraft = (draft) => {
+    document.getElementById('summary').value = draft.summary;
+    document.getElementById('summary-tags').value = draft.tags.join(', ');
+    currentSummary = draft.summary;
+    currentDraft = draft;
+    
+    // Update UI to show draft status
+    updateDraftStatus('Draft restored');
+    showToast('Draft restored successfully', 'success');
+};
+
+const autoSaveDraft = async () => {
+    const summary = document.getElementById('summary').value.trim();
+    const tags = document.getElementById('summary-tags').value.split(',').map(t => t.trim()).filter(t => t);
+    
+    // Only save if there's content and it's different from current draft
+    if (!summary) return;
+    
+    if (currentDraft && 
+        currentDraft.summary === summary && 
+        JSON.stringify(currentDraft.tags) === JSON.stringify(tags)) {
+        return; // No changes
+    }
+    
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!tab?.url) return;
+        
+        const draft = {
+            id: currentDraft?.id || Date.now(),
+            url: tab.url,
+            title: tab.title,
+            summary: summary,
+            tags: tags,
+            savedAt: Date.now()
+        };
+        
+        const result = await storageGet(['drafts']);
+        const drafts = result.drafts || [];
+        const existingIndex = drafts.findIndex(d => d.url === tab.url);
+        
+        if (existingIndex >= 0) {
+            drafts[existingIndex] = draft;
+        } else {
+            drafts.push(draft);
+        }
+        
+        // Keep only last 10 drafts
+        drafts.splice(0, drafts.length - 10);
+        
+        await chrome.storage.local.set({ drafts: drafts });
+        currentDraft = draft;
+        
+        updateDraftStatus('Auto-saved');
+        Logger.info('Draft auto-saved');
+    } catch (error) {
+        Logger.error('Failed to auto-save draft:', error);
+    }
+};
+
+const saveDraftOnUnload = () => {
+    // Force save on page unload
+    const summary = document.getElementById('summary').value.trim();
+    if (summary) {
+        autoSaveDraft();
+    }
+};
+
+const deleteDraft = async (url) => {
+    try {
+        const result = await storageGet(['drafts']);
+        const drafts = result.drafts || [];
+        const filteredDrafts = drafts.filter(d => d.url !== url);
+        await chrome.storage.local.set({ drafts: filteredDrafts });
+        
+        if (currentDraft && currentDraft.url === url) {
+            currentDraft = null;
+            updateDraftStatus('');
+        }
+        
+        showToast('Draft deleted', 'info');
+    } catch (error) {
+        Logger.error('Failed to delete draft:', error);
+    }
+};
+
+const updateDraftStatus = (status) => {
+    const statusDiv = document.getElementById('draft-status');
+    if (statusDiv) {
+        statusDiv.textContent = status;
+        statusDiv.style.display = status ? 'block' : 'none';
+        
+        // Clear status after 3 seconds
+        if (status) {
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+    }
+};
+
+const showDraftsManager = () => {
+    const modal = document.createElement('div');
+    modal.className = 'drafts-manager-modal-overlay';
+    modal.innerHTML = `
+        <div class="drafts-manager-modal">
+            <div class="drafts-manager-header">
+                <h3>Saved Drafts</h3>
+                <button class="close-drafts-manager">&times;</button>
+            </div>
+            <div class="drafts-list" id="drafts-list">
+                <div class="loading-drafts">Loading drafts...</div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.close-drafts-manager').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+    
+    loadDraftsList(modal);
+};
+
+const loadDraftsList = async (modal) => {
+    try {
+        const result = await storageGet(['drafts']);
+        const drafts = result.drafts || [];
+        const draftsList = modal.querySelector('#drafts-list');
+        
+        if (drafts.length === 0) {
+            draftsList.innerHTML = '<div class="no-drafts">No saved drafts</div>';
+            return;
+        }
+        
+        draftsList.innerHTML = drafts.map(draft => `
+            <div class="draft-item" data-url="${draft.url}">
+                <div class="draft-info">
+                    <h4>${draft.title || 'Untitled'}</h4>
+                    <span class="draft-date">${new Date(draft.savedAt).toLocaleString()}</span>
+                    <p class="draft-preview">${draft.summary.substring(0, 150)}${draft.summary.length > 150 ? '...' : ''}</p>
+                    ${draft.tags.length > 0 ? `<div class="draft-tags">${draft.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ''}
+                </div>
+                <div class="draft-actions">
+                    <button class="load-draft-btn" data-draft='${JSON.stringify(draft)}'>Load</button>
+                    <button class="delete-draft-btn" data-url="${draft.url}">Delete</button>
+                </div>
+            </div>
+        `).join('');
+        
+        // Add event listeners
+        modal.querySelectorAll('.load-draft-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const draft = JSON.parse(e.target.dataset.draft);
+                restoreDraft(draft);
+                modal.remove();
+            });
+        });
+        
+        modal.querySelectorAll('.delete-draft-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const url = e.target.dataset.url;
+                deleteDraft(url);
+                loadDraftsList(modal); // Refresh list
+            });
+        });
+        
+    } catch (error) {
+        Logger.error('Failed to load drafts list:', error);
+        modal.querySelector('#drafts-list').innerHTML = '<div class="error-drafts">Failed to load drafts</div>';
+    }
+};
 
 // Offline mode functionality
 const initOfflineMode = () => {
@@ -179,6 +428,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loadStats();
     loadCustomPrompts();
     initOfflineMode();
+    initAutoSave();
     checkApiKey();
 
     // warn if user has entered tags but hasn't summarized/bookmarked
@@ -1166,6 +1416,12 @@ ${text}` }
     quickBatch.addEventListener('click', () => {
         quickActionsMenu.style.display = 'none';
         batchSummarizeTabs();
+    });
+
+    const quickDrafts = document.getElementById('quick-drafts');
+    quickDrafts.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        showDraftsManager();
     });
 
     quickClear.addEventListener('click', () => {

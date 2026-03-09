@@ -60,6 +60,10 @@
                         <i class="material-icons-round">library_books</i>
                         Batch Summarize All Tabs
                     </button>
+                    <button id="quick-drafts" class="dropdown-item">
+                        <i class="material-icons-round">draft</i>
+                        Manage Drafts
+                    </button>
                     <button id="quick-clear" class="dropdown-item">
                         <i class="material-icons-round">delete_sweep</i>
                         Clear History
@@ -118,6 +122,7 @@
                 <i class="material-icons-round">schedule</i>
                 <span id="last-updated-time"></span>
             </div>
+            <div id="draft-status" class="draft-status" style="display: none;"></div>
             <!-- Tags input for manual labeling -->
             <div class="tag-input-container">
                 <input type="text" id="summary-tags" placeholder="Add tags (comma separated)" aria-label="Tags">
