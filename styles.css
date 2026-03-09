@@ -1203,6 +1203,11 @@ textarea#summary:focus {
     font-size: 12px;
 }
 
+.warning-chip {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
 .history-source-group {
     display: flex;
     align-items: center;

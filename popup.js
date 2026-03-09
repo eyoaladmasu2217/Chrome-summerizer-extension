@@ -41,6 +41,132 @@ let chatHistory = [];
 let synth = window.speechSynthesis;
 let isReading = false;
 let showBookmarksOnly = false;
+let isOnline = navigator.onLine;
+let cachedSummaries = new Map();
+
+// Offline mode functionality
+const initOfflineMode = () => {
+    // Monitor online/offline status
+    window.addEventListener('online', handleOnlineStatus);
+    window.addEventListener('offline', handleOfflineStatus);
+    
+    // Load cached summaries
+    loadCachedSummaries();
+    
+    // Register service worker for caching
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(registration => {
+                Logger.info('Service Worker registered:', registration);
+            })
+            .catch(error => {
+                Logger.error('Service Worker registration failed:', error);
+            });
+    }
+    
+    updateOfflineIndicator();
+};
+
+const handleOnlineStatus = () => {
+    isOnline = true;
+    updateOfflineIndicator();
+    showToast('Back online! Syncing data...', 'success');
+    syncOfflineData();
+};
+
+const handleOfflineStatus = () => {
+    isOnline = false;
+    updateOfflineIndicator();
+    showToast('You are offline. Using cached data.', 'warning');
+};
+
+const updateOfflineIndicator = () => {
+    const indicator = document.getElementById('offline-indicator');
+    if (indicator) {
+        indicator.style.display = isOnline ? 'none' : 'flex';
+        indicator.innerHTML = `
+            <i class="material-icons-round">wifi_off</i>
+            <span>Offline Mode</span>
+        `;
+    }
+};
+
+const loadCachedSummaries = () => {
+    chrome.storage.local.get(['cachedSummaries'], (result) => {
+        const cached = result.cachedSummaries || [];
+        cachedSummaries.clear();
+        cached.forEach(summary => {
+            cachedSummaries.set(summary.url, summary);
+        });
+        Logger.info(`Loaded ${cached.length} cached summaries`);
+    });
+};
+
+const cacheSummary = (summaryData) => {
+    const cacheEntry = {
+        ...summaryData,
+        cachedAt: Date.now(),
+        isOffline: !isOnline
+    };
+    
+    cachedSummaries.set(summaryData.url, cacheEntry);
+    
+    // Save to storage
+    const cachedArray = Array.from(cachedSummaries.values());
+    chrome.storage.local.set({ cachedSummaries: cachedArray });
+    
+    Logger.info('Summary cached for offline access');
+};
+
+const getCachedSummary = (url) => {
+    return cachedSummaries.get(url);
+};
+
+const syncOfflineData = () => {
+    if (!isOnline) return;
+    
+    chrome.storage.local.get(['summaries', 'cachedSummaries'], (result) => {
+        const mainSummaries = result.summaries || [];
+        const cached = result.cachedSummaries || [];
+        
+        // Find summaries that were created offline and need to be synced
+        const offlineSummaries = cached.filter(s => s.isOffline);
+        
+        if (offlineSummaries.length > 0) {
+            const syncedSummaries = [...mainSummaries, ...offlineSummaries.map(s => ({
+                ...s,
+                isOffline: false
+            }))];
+            
+            chrome.storage.local.set({ summaries: syncedSummaries }, () => {
+                // Clear offline flag from cached summaries
+                const updatedCached = cached.map(s => ({ ...s, isOffline: false }));
+                chrome.storage.local.set({ cachedSummaries: updatedCached });
+                
+                showToast(`Synced ${offlineSummaries.length} offline summaries`, 'success');
+                loadHistory(); // Refresh the history view
+            });
+        }
+    });
+};
+
+const handleOfflineSummarize = async (tab) => {
+    const cached = getCachedSummary(tab.url);
+    if (cached) {
+        currentSummary = cached.summary;
+        document.getElementById('summary').value = currentSummary;
+        document.getElementById('summary-tags').value = (cached.tags || []).join(', ');
+        
+        // Update UI to show cached status
+        const statusDiv = document.getElementById('summary-status');
+        statusDiv.innerHTML = '<i class="material-icons-round">cached</i> Loaded from cache';
+        statusDiv.style.display = 'flex';
+        
+        showToast('Summary loaded from cache', 'info');
+        return true;
+    }
+    return false;
+};
 
 
 
@@ -52,6 +178,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loadHistory();
     loadStats();
     loadCustomPrompts();
+    initOfflineMode();
     checkApiKey();
 
     // warn if user has entered tags but hasn't summarized/bookmarked
@@ -1227,6 +1354,22 @@ const handleSummarize = async (isEli5 = false) => {
     const statusSteps = document.getElementById('status-steps');
     const errorContainer = document.getElementById('error-container');
 
+    // Check for cached summary if offline
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!isOnline) {
+        const cachedLoaded = await handleOfflineSummarize(tab);
+        if (cachedLoaded) {
+            summarizeBtn.innerText = 'Summarize';
+            summarizeBtn.disabled = false;
+            return;
+        } else {
+            showToast('No cached summary available for this page', 'error');
+            summarizeBtn.innerText = 'Summarize';
+            summarizeBtn.disabled = false;
+            return;
+        }
+    }
+
     // read auto-tag setting early
     let autoTagEnabled = true;
     try {
@@ -1364,6 +1507,9 @@ const handleSummarize = async (isEli5 = false) => {
             const summaries = result.summaries || [];
             summaries.unshift(historyItem);
             chrome.storage.local.set({ summaries: summaries.slice(0, 50) });
+            
+            // Cache the summary for offline access
+            cacheSummary(historyItem);
         });
 
         // Display links
