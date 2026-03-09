@@ -651,6 +651,112 @@ ${text}` }
         });
     };
 
+    const shareSummary = (platform, summaryData) => {
+        const title = summaryData.title || 'AI Summary';
+        const text = summaryData.summary || '';
+        const url = summaryData.url || '';
+        const tags = summaryData.tags ? `#${summaryData.tags.join(' #')}` : '';
+        
+        let shareUrl = '';
+        const encodedText = encodeURIComponent(`${title}\n\n${text.substring(0, 200)}${text.length > 200 ? '...' : ''}\n\n${tags}`);
+        const encodedUrl = encodeURIComponent(url);
+        
+        switch (platform) {
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+                break;
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+                break;
+            case 'copy':
+                navigator.clipboard.writeText(`${title}\n\n${text}\n\nSource: ${url}\n\n${tags}`).then(() => {
+                    showToast('Summary copied to clipboard!');
+                }).catch(err => {
+                    Logger.error('Failed to copy to clipboard', err);
+                    showToast('Failed to copy to clipboard', 'error');
+                });
+                return;
+        }
+        
+        if (shareUrl) {
+            chrome.tabs.create({ url: shareUrl });
+            showToast(`Shared to ${platform.charAt(0).toUpperCase() + platform.slice(1)}!`);
+        }
+    };
+
+    const shareCurrentSummary = (platform) => {
+        if (!currentSummary) {
+            showToast('No summary to share', 'error');
+            return;
+        }
+        
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const currentTab = tabs[0];
+            const summaryData = {
+                title: currentTab.title,
+                url: currentTab.url,
+                summary: currentSummary,
+                tags: document.getElementById('summary-tags')?.value.split(',').map(t => t.trim()).filter(t => t) || []
+            };
+            shareSummary(platform, summaryData);
+        });
+    };
+
+    const showShareModal = () => {
+        const modal = document.createElement('div');
+        modal.className = 'share-modal-overlay';
+        modal.innerHTML = `
+            <div class="share-modal">
+                <div class="share-modal-header">
+                    <h3>Share Summary</h3>
+                    <button class="close-share-modal">&times;</button>
+                </div>
+                <div class="share-options">
+                    <button class="share-option twitter-share" data-platform="twitter">
+                        <i class="fab fa-twitter"></i>
+                        <span>Twitter</span>
+                    </button>
+                    <button class="share-option linkedin-share" data-platform="linkedin">
+                        <i class="fab fa-linkedin"></i>
+                        <span>LinkedIn</span>
+                    </button>
+                    <button class="share-option facebook-share" data-platform="facebook">
+                        <i class="fab fa-facebook"></i>
+                        <span>Facebook</span>
+                    </button>
+                    <button class="share-option copy-share" data-platform="copy">
+                        <i class="fas fa-copy"></i>
+                        <span>Copy Link</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Event listeners
+        modal.querySelector('.close-share-modal').addEventListener('click', () => {
+            modal.remove();
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+        
+        modal.querySelectorAll('.share-option').forEach(button => {
+            button.addEventListener('click', () => {
+                const platform = button.dataset.platform;
+                shareCurrentSummary(platform);
+                modal.remove();
+            });
+        });
+    };
+
     const clearAllHistory = () => {
         chrome.storage.local.set({ summaries: [] }, () => {
             loadHistory();
@@ -1078,17 +1184,11 @@ ${text}` }
     });
 
     shareBtn.addEventListener('click', () => {
-        const text = textarea.value;
-        if (!text) return;
-
-        const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Summarize AI Recap</title><style>body{font-family:sans-serif;background:#f8fafc;padding:40px;color:#0f172a;line-height:1.6;} .card{background:white;padding:40px;border-radius:24px;box-shadow:0 10px 40px rgba(0,0,0,0.05);max-width:800px;margin:0 auto;} h1{color:#6366f1;margin-top:0;} pre{white-space:pre-wrap;font-family:inherit;}</style></head><body><div class="card"><h1>Recap</h1><pre>${text}</pre></div></body></html>`;
-        const shareUrl = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
-
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            const original = shareBtn.innerHTML;
-            shareBtn.innerHTML = '<i class="material-icons-round">link</i> Link Copied';
-            setTimeout(() => shareBtn.innerHTML = original, 2000);
-        });
+        if (!currentSummary) {
+            showToast('No summary to share', 'error');
+            return;
+        }
+        showShareModal();
     });
 
     const scrollTopBtn = document.getElementById('scroll-top-btn');
