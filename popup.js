@@ -51,6 +51,7 @@ window.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
     loadHistory();
     loadStats();
+    loadCustomPrompts();
     checkApiKey();
 
     // warn if user has entered tags but hasn't summarized/bookmarked
@@ -75,6 +76,26 @@ const checkApiKey = async () => {
     } catch (err) {
         Logger.error('Failed to check API key', err);
     }
+};
+
+const loadCustomPrompts = () => {
+    chrome.storage.sync.get(['customPrompts'], (result) => {
+        const prompts = result.customPrompts || [];
+        const templateSelect = document.getElementById('summary-template');
+        
+        // Remove existing custom prompt options
+        const existingCustom = templateSelect.querySelectorAll('option[data-custom]');
+        existingCustom.forEach(option => option.remove());
+        
+        // Add custom prompts
+        prompts.forEach((prompt, index) => {
+            const option = document.createElement('option');
+            option.value = `custom-${index}`;
+            option.textContent = `⭐ ${prompt.name}`;
+            option.setAttribute('data-custom', 'true');
+            templateSelect.appendChild(option);
+        });
+    });
 };
 
 const loadStats = async () => {
@@ -1364,68 +1385,86 @@ const getSummary = async (text, links = [], isEli5 = false, template = 'default'
 
     let systemPrompt = `You are an expert content analyst. Your task is to summarize the provided text in ${language}.`;
     
-    switch (template) {
-        case 'article':
-            systemPrompt += `
-            This is an article/blog post. Focus on:
-            - Main thesis and supporting arguments
-            - Author's perspective and key insights
-            - Practical implications or takeaways
-            - Writing style and rhetorical devices used`;
-            break;
-        case 'research':
-            systemPrompt += `
-            This is a research paper/academic content. Focus on:
-            - Research methodology and findings
-            - Key hypotheses and conclusions
-            - Statistical significance and data insights
-            - Theoretical framework and contributions`;
-            break;
-        case 'news':
-            systemPrompt += `
-            This is a news article. Focus on:
-            - Who, What, When, Where, Why, How
-            - Key facts and timeline of events
-            - Stakeholder perspectives
-            - Broader context and implications`;
-            break;
-        case 'technical':
-            systemPrompt += `
-            This is technical documentation. Focus on:
-            - Core functionality and features
-            - Implementation details and requirements
-            - Usage examples and best practices
-            - Technical specifications and limitations`;
-            break;
-        case 'creative':
-            systemPrompt += `
-            This is creative content (story, fiction, etc.). Focus on:
-            - Plot summary and key events
-            - Character development and themes
-            - Writing style and literary devices
-            - Emotional impact and artistic elements`;
-            break;
-        case 'business':
-            systemPrompt += `
-            This is business/financial content. Focus on:
-            - Key business decisions and strategies
-            - Financial implications and metrics
-            - Market analysis and competitive landscape
-            - Risk factors and future outlook`;
-            break;
-        default:
+    if (template.startsWith('custom-')) {
+        // Handle custom prompts
+        const customIndex = parseInt(template.split('-')[1]);
+        const customPrompts = await new Promise(resolve => {
+            chrome.storage.sync.get(['customPrompts'], resolve);
+        });
+        const customPrompt = customPrompts.customPrompts?.[customIndex];
+        if (customPrompt) {
+            systemPrompt = customPrompt.content.replace('{language}', language);
+        } else {
             systemPrompt += `
             Provide a general-purpose summary.`;
+        }
+    } else {
+        // Handle built-in templates
+        switch (template) {
+            case 'article':
+                systemPrompt += `
+                This is an article/blog post. Focus on:
+                - Main thesis and supporting arguments
+                - Author's perspective and key insights
+                - Practical implications or takeaways
+                - Writing style and rhetorical devices used`;
+                break;
+            case 'research':
+                systemPrompt += `
+                This is a research paper/academic content. Focus on:
+                - Research methodology and findings
+                - Key hypotheses and conclusions
+                - Statistical significance and data insights
+                - Theoretical framework and contributions`;
+                break;
+            case 'news':
+                systemPrompt += `
+                This is a news article. Focus on:
+                - Who, What, When, Where, Why, How
+                - Key facts and timeline of events
+                - Stakeholder perspectives
+                - Broader context and implications`;
+                break;
+            case 'technical':
+                systemPrompt += `
+                This is technical documentation. Focus on:
+                - Core functionality and features
+                - Implementation details and requirements
+                - Usage examples and best practices
+                - Technical specifications and limitations`;
+                break;
+            case 'creative':
+                systemPrompt += `
+                This is creative content (story, fiction, etc.). Focus on:
+                - Plot summary and key events
+                - Character development and themes
+                - Writing style and literary devices
+                - Emotional impact and artistic elements`;
+                break;
+            case 'business':
+                systemPrompt += `
+                This is business/financial content. Focus on:
+                - Key business decisions and strategies
+                - Financial implications and metrics
+                - Market analysis and competitive landscape
+                - Risk factors and future outlook`;
+                break;
+            default:
+                systemPrompt += `
+                Provide a general-purpose summary.`;
+        }
     }
     
-    systemPrompt += `
-    Follow this structure:
-    [METADATA]: CATEGORY: <Single Word Category>, SENTIMENT: <Single Word Sentiment>, KEYWORDS: <3-5 comma separated keywords>
-    1. **💡 Key Takeaways**: List 3-5 most important points as bullet points with emojis.
-    2. **📝 Summary**: ${lengthInstruction} ${toneInstruction}
-    3. **🔗 References**: If links are provided, mention the most relevant ones naturally.
-    
-    Use Markdown for formatting. Avoid fluff.`;
+    if (!template.startsWith('custom-')) {
+        systemPrompt += `
+        Follow this structure:
+        [METADATA]: CATEGORY: <Single Word Category>, SENTIMENT: <Single Word Sentiment>, KEYWORDS: <3-5 comma separated keywords>
+        1. **💡 Key Takeaways**: List 3-5 most important points as bullet points with emojis.
+        2. **📝 Summary**: ${lengthInstruction} ${toneInstruction}
+        3. **🔗 References**: If links are provided, mention the most relevant ones naturally.
+        
+        Use Markdown for formatting. Avoid fluff.`;
+    }
 
     const payload = {
         model,

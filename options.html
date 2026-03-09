@@ -132,6 +132,11 @@
                 <i class="material-icons-round">settings</i>
                 Settings
             </button>
+            <button id="prompts-tab" class="tab-button" role="tab" aria-selected="false"
+                aria-controls="prompts-section">
+                <i class="material-icons-round">edit</i>
+                Custom Prompts
+            </button>
             <button id="stats-tab" class="tab-button" role="tab" aria-selected="false"
                 aria-controls="stats-section">
                 <i class="material-icons-round">analytics</i>
@@ -218,6 +223,21 @@
                 Save Configuration
             </button>
         </form>
+        </div>
+
+        <div id="prompts-section" class="tab-content" role="tabpanel" aria-labelledby="prompts-tab">
+            <div class="prompts-manager">
+                <div class="prompts-header">
+                    <h3>Custom Prompts</h3>
+                    <button id="add-prompt-btn" class="buttons secondary-btn">
+                        <i class="material-icons-round">add</i>
+                        New Prompt
+                    </button>
+                </div>
+                <div id="prompts-list" class="prompts-list">
+                    <!-- Custom prompts will be loaded here -->
+                </div>
+            </div>
         </div>
 
         <section id="stats-section" class="tab-content" role="tabpanel" aria-labelledby="stats-tab">
