@@ -490,11 +490,19 @@ ${text}` }
 
     const modelFilter = document.getElementById('filter-model');
     const sentimentFilter = document.getElementById('filter-sentiment');
+    const dateFromFilter = document.getElementById('filter-date-from');
+    const dateToFilter = document.getElementById('filter-date-to');
     if (modelFilter) {
         modelFilter.addEventListener('change', () => loadHistory(historySearch.value));
     }
     if (sentimentFilter) {
         sentimentFilter.addEventListener('change', () => loadHistory(historySearch.value));
+    }
+    if (dateFromFilter) {
+        dateFromFilter.addEventListener('change', () => loadHistory(historySearch.value));
+    }
+    if (dateToFilter) {
+        dateToFilter.addEventListener('change', () => loadHistory(historySearch.value));
     }
 
     const sortBtn = document.getElementById('sort-order-btn');
@@ -1231,6 +1239,21 @@ const loadHistory = (searchQuery = '') => {
         if (sentimentFilter && sentimentFilter.value) {
             const val = sentimentFilter.value.toLowerCase();
             summaries = summaries.filter(item => (item.sentiment || '').toLowerCase().includes(val));
+        }
+        // apply date range filter
+        const dateFrom = document.getElementById('filter-date-from')?.value;
+        const dateTo = document.getElementById('filter-date-to')?.value;
+        if (dateFrom || dateTo) {
+            summaries = summaries.filter(item => {
+                const itemDate = new Date(item.date);
+                const fromDate = dateFrom ? new Date(dateFrom) : null;
+                const toDate = dateTo ? new Date(dateTo) : null;
+                toDate?.setHours(23, 59, 59, 999); // Include the entire end date
+                
+                if (fromDate && itemDate < fromDate) return false;
+                if (toDate && itemDate > toDate) return false;
+                return true;
+            });
         }
         // sort results
         summaries.sort((a, b) => {
