@@ -217,6 +217,36 @@ h1 {
     box-shadow: 0 0 0 3px var(--primary-light);
 }
 
+/* template selector */
+.template-selector {
+    margin: 8px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.template-selector label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+.template-select {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--glass-border);
+    background: var(--card-bg);
+    color: var(--text-main);
+    transition: border-color 0.2s;
+}
+.template-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
 /* history tags display */
 .history-tags {
     margin: 6px 0 0;
