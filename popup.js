@@ -775,6 +775,34 @@ ${text}` }
             const tagField = document.getElementById('summary-tags');
             if (tagField) tagField.focus();
         }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+            e.preventDefault();
+            const summary = document.getElementById('summary').value;
+            if (summary) {
+                navigator.clipboard.writeText(summary).then(() => {
+                    showToast('Summary copied to clipboard!');
+                });
+            }
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e') {
+            e.preventDefault();
+            exportAllHistory('txt');
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h') {
+            e.preventDefault();
+            document.getElementById('history-tab').click();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+            document.getElementById('summarize-tab').click();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'r' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            const regenerateBtn = document.getElementById('regenerate-btn');
+            if (regenerateBtn && regenerateBtn.style.display !== 'none') {
+                handleSummarize();
+            }
+        }
     });
 
     copyBtn.addEventListener('click', () => {
