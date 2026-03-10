@@ -120,6 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
             await storageSet(settings);
             document.body.classList.toggle('light-mode', !settings.darkMode);
             status.innerHTML = '<i class="material-icons-round" style="vertical-align: bottom; font-size: 16px;">check_circle</i> Settings applied successfully!';
+            // analytics
+            chrome.runtime.sendMessage({ type: 'ANALYTICS', event: 'options_saved' });
         } catch (err) {
             Logger.error('Unable to save options', err);
             status.textContent = 'Error saving settings';

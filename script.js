@@ -5,6 +5,8 @@
     const DEFAULT_MODEL = 'Summerizer';
     const MIN_SELECTION_LEN = 50;
     const OVERLAY_ID = 'summary-overlay';
+    // high z-index so overlay floats above almost everything
+    const OVERLAY_Z_INDEX = 2147483647;
 
     // state
     let overlay = null;
@@ -26,7 +28,6 @@
 const getSelectionSummary = async (text) => {
     const settings = await storageGet(['summaryLength', 'outputLanguage', 'aiModel', 'apiKey']);
     const model = settings.aiModel || DEFAULT_MODEL;
-    const length = settings.summaryLength || 'short';
     const language = settings.outputLanguage || 'en';
     const apiKey = settings.apiKey;
 
@@ -66,7 +67,7 @@ const createSummaryOverlay = () => {
     if (overlay) return;
 
     overlay = document.createElement('div');
-    overlay.id = 'summary-overlay';
+    overlay.id = OVERLAY_ID;
 
     // Load dark mode
     storageGet(['darkMode']).then(result => {
@@ -110,6 +111,7 @@ const createSummaryOverlay = () => {
             overlay.appendChild(content);
             summaryButton.innerHTML = originalContent;
         } catch (error) {
+            console.error('Overlay summarization failed', error);
             summaryButton.innerHTML = '<i class="material-icons-round" style="font-size: 16px;">error</i> Error - Try Again';
         } finally {
             summaryButton.disabled = false;
@@ -193,6 +195,41 @@ document.addEventListener('mouseup', (e) => {
         showOverlay(rect.left + window.scrollX, rect.bottom + window.scrollY + 10);
     } else {
         hideOverlay();
+    }
+});
+
+// listen for messages from background service worker (context menu/keyboard shortcuts)
+window.addEventListener('message', async (event) => {
+    if (event.source !== window) return;
+    const msg = event.data;
+    if (!msg || msg.type !== 'SUMMARIZE_FROM_CM') return;
+
+    let textToSummarize = msg.text;
+    if (!textToSummarize) {
+        // no selection provided, grab page text
+        textToSummarize = extractCleanText();
+    }
+
+    if (textToSummarize && textToSummarize.length > MIN_SELECTION_LEN) {
+        currentSelectedText = textToSummarize;
+        try {
+            const summary = await getSelectionSummary(currentSelectedText);
+            // create or reuse overlay and show summary immediately
+            createSummaryOverlay();
+            const prev = overlay.querySelector('.summary-content');
+            if (prev) prev.remove();
+            const content = document.createElement('div');
+            content.className = 'summary-content';
+            content.innerHTML = summary.replace(/\n/g, '<br>');
+            overlay.appendChild(content);
+            overlay.style.display = 'flex';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '10px';
+            overlay.style.left = '10px';
+            overlay.style.zIndex = OVERLAY_Z_INDEX;
+        } catch (err) {
+            console.error('context-menu summary failed', err);
+        }
     }
 });
 

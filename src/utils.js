@@ -86,3 +86,36 @@ export function getRelativeTime(timestamp) {
     if (hours < 24) return rtf.format(-hours, 'hour');
     return rtf.format(-days, 'day');
 }
+/**
+ * Send a simple analytics event using the Measurement Protocol (GA4).
+ * The background service worker will usually call this, but popups/pages can
+ * also forward messages via runtime.sendMessage.
+ *
+ * @param {string} eventName
+ * @param {Object} [params]
+ * @returns {Promise<void>}
+ */
+export async function sendAnalyticsEvent(eventName, params = {}) {
+    try {
+        // NOTE: analytics ID is imported by caller to avoid circular dependency
+        const { ANALYTICS_ID } = await import('./constants.js');
+        if (!ANALYTICS_ID || ANALYTICS_ID.startsWith('G-XXXXXXXX')) {
+            // analytics disabled or not configured
+            return;
+        }
+
+        const url = `https://www.google-analytics.com/mp/collect?measurement_id=${ANALYTICS_ID}&api_secret=${encodeURIComponent('REPLACE_WITH_SECRET')}`;
+        const payload = {
+            client_id: chrome.runtime.id,
+            events: [{ name: eventName, params }]
+        };
+
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch (err) {
+        console.error('Analytics send failed', err);
+    }
+}

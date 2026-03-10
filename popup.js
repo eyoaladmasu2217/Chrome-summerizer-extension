@@ -3,7 +3,6 @@
 // module imports
 import {
     storageGet,
-    storageSet,
     showToast,
     triggerHaptic,
     updateThemeIcon,
@@ -506,16 +505,6 @@ const updateStats = async (minutesSaved) => {
 };
 
 
-/**
- * Visual Haptic Feedback
- * Triggers a subtle pulse animation on an element
- */
-const triggerHaptic = (element) => {
-    if (!element) return;
-    element.classList.remove('haptic-pulse');
-    void element.offsetWidth; // Force reflow
-    element.classList.add('haptic-pulse');
-};
 
 const initSettings = () => {
     const themeToggle = document.getElementById('theme-toggle');
@@ -524,28 +513,31 @@ const initSettings = () => {
     (async () => {
         try {
             const result = await storageGet([STORAGE_KEYS.DARK_MODE, STORAGE_KEYS.AUTO_COPY]);
-                let darkMode;
-                if (result.darkMode === undefined) {
-                    // use system preference when not explicitly set
-                    darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                } else {
-                    darkMode = result.darkMode;
-                }
-                document.body.classList.toggle('light-mode', !darkMode);
-                updateThemeIcon(darkMode);
-                if (result.autoCopy && autocopyChip) {
-                    autocopyChip.style.display = 'flex';
-                }
+            let darkMode;
+            if (result.darkMode === undefined) {
+                // use system preference when not explicitly set
+                darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            } else {
+                darkMode = result.darkMode;
+            }
+            document.body.classList.toggle('light-mode', !darkMode);
+            updateThemeIcon(darkMode);
+            if (result.autoCopy && autocopyChip) {
+                autocopyChip.style.display = 'flex';
+            }
 
-                // listen for system changes when user hasn't locked preference
-                const mql = window.matchMedia('(prefers-color-scheme: dark)');
-                mql.addEventListener('change', e => {
-                    if (result.darkMode === undefined) {
-                        const sysDark = e.matches;
-                        document.body.classList.toggle('light-mode', !sysDark);
-                        updateThemeIcon(sysDark);
-                    }
-                });
+            // listen for system changes when user hasn't locked preference
+            const mql = window.matchMedia('(prefers-color-scheme: dark)');
+            mql.addEventListener('change', e => {
+                if (result.darkMode === undefined) {
+                    const sysDark = e.matches;
+                    document.body.classList.toggle('light-mode', !sysDark);
+                    updateThemeIcon(sysDark);
+                }
+            });
+        } catch (err) {
+            Logger.error('initSettings failed', err);
+        }
     })();
 
     themeToggle.addEventListener('click', () => {
@@ -558,12 +550,6 @@ const initSettings = () => {
     });
 };
 
-const updateThemeIcon = (isDark) => {
-    const icon = document.querySelector('#theme-toggle i');
-    if (icon) {
-        icon.textContent = isDark ? 'light_mode' : 'dark_mode';
-    }
-};
 
 const initTabs = () => {
     const summarizeTab = document.getElementById('summarize-tab');
@@ -1360,6 +1346,7 @@ ${text}` }
     const quickExportCsv = document.getElementById('quick-export-csv');
     const quickExportPdf = document.getElementById('quick-export-pdf');
     const quickClear = document.getElementById('quick-clear');
+    const quickSupport = document.getElementById('quick-support');
 
     const bookmarkBtn = document.getElementById('bookmark-btn');
 
@@ -1410,6 +1397,11 @@ ${text}` }
     quickExportPdf.addEventListener('click', () => {
         quickActionsMenu.style.display = 'none';
         exportAllHistory('pdf');
+    });
+
+    quickSupport.addEventListener('click', () => {
+        quickActionsMenu.style.display = 'none';
+        window.open('https://yourdomain.com/support', '_blank');
     });
 
     const quickBatch = document.getElementById('quick-batch');
@@ -1600,6 +1592,9 @@ const updateStepStatus = (stepNumber, status) => {
 };
 
 const handleSummarize = async (isEli5 = false) => {
+    // analytics: user initiated a summarization request
+    chrome.runtime.sendMessage({ type: 'ANALYTICS', event: 'summarize_requested', payload: { eli5: !!isEli5 } });
+
     const summarizeBtn = document.getElementById('summarize-btn');
     const textarea = document.getElementById('summary');
     const tagInput = document.getElementById('summary-tags');

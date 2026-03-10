@@ -10,6 +10,11 @@
 
 ## � New Features
 
+- 🖱️ **Right-click context menus** – summarize any selected text or entire page straight from the page menu.
+- ⌨️ **Keyboard shortcuts** – `Ctrl+Shift+S` (⌘⇧S on Mac) to summarize a selection, `Ctrl+Shift+U` to open popup.
+- 👋 **Welcome / onboarding page** launches automatically after install with quick start instructions.
+- 📈 Analytics events sent to Google Analytics (configurable) to help understand usage patterns while respecting privacy.
+- 📬 **Uninstall feedback** URL configured to capture why users leave.
 - Tagging system: manually add tags to summarized content and filter history by tags.
 - Auto-tagging: optionally generate tags from AI-provided keywords (configurable in settings).
 - Click on any tag in history to filter results instantly (double-click to remove it from that entry).

@@ -13,3 +13,10 @@ export const STORAGE_KEYS = {
     AUTO_COPY: 'autoCopy',
     AUTO_TAG: 'autoTag'
 };
+
+// analytics measurement ID (Google Analytics 4 or similar)
+export const ANALYTICS_ID = 'G-XXXXXXXXXX';
+
+// small helper urls used across the extension
+export const WELCOME_PAGE = chrome.runtime.getURL('welcome.html');
+

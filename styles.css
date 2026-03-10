@@ -1809,6 +1809,19 @@ body.reading-mode textarea#summary {
 }
 
 /* High contrast mode support */
+
+/* quick action dropdown divider */
+.dropdown-divider {
+    height: 1px;
+    margin: 4px 0;
+    background: var(--glass-border);
+}
+
+/* links inside popup/options */
+a, a:hover, a:active {
+    color: var(--primary);
+    text-decoration: none;
+}
 @media (prefers-contrast: high) {
     :root {
         --glass-border: rgba(255, 255, 255, 0.3);
